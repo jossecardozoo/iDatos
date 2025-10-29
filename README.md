@@ -1,16 +1,44 @@
-# monteroom
+# Monteroom 🏙️
 
-A new Flutter project.
+Proyecto desarrollado para la materia **Integración de Datos**  
+**Facultad de Ingeniería, Universidad de la República (FIng - Udelar)**  
+**Integrantes:**  
+- Josefina Cardozo — 5.224.009-2  
+- Mayte Carro — 5.396.847-1  
+- Carolina Martínez — 5.245.351-8  
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📘 Descripción
 
-A few resources to get you started if this is your first Flutter project:
+**Monteroom** es una aplicación desarrollada en **Flutter** que integra información de distintas fuentes inmobiliarias y datasets públicos para facilitar la búsqueda, comparación y recomendación de viviendas en Montevideo.  
+Forma parte de un proyecto ETL que aborda la **integración de datos heterogéneos** (HTML, JSON, CSV, GPKG) provenientes de portales como **Mercado Libre**, **Gallito Luis** e **InfoCasas**, además de fuentes abiertas de la Intendencia de Montevideo (proximidad a servicios, seguridad, transporte, etc.).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🎯 Objetivo
+
+Centralizar y estandarizar la información de alquiler y venta de propiedades, resolviendo heterogeneidades **sintácticas**, **estructurales**, **temporales** y **espaciales** para brindar:
+- Comparación entre anuncios duplicados.  
+- Visualización de precios, seguridad y servicios cercanos.  
+- Recomendaciones personalizadas según preferencias del usuario.
+
+---
+
+## 🧩 Tecnologías
+
+- **Frontend:** Flutter  
+- **Lenguaje:** Dart  
+- **Procesos ETL:** Python / Pandas / GeoPandas  
+- **Fuentes de datos:**  
+  - Portales inmobiliarios (HTML / JSON)  
+  - Datasets públicos (INE, GeoServer Montevideo, Observatorio de Seguridad)  
+
+---
+
+## 🚀 Ejecución
+
+Clonar el repositorio:
+```bash
+git clone https://github.com/<usuario>/monteroom.git
+cd monteroom
