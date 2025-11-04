@@ -80,8 +80,7 @@ class ListingCard extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   Text(
-                    '\$${listing.precioUYU?.toStringAsFixed(0) ?? '-'} UYU  '
-                    '(\$${listing.precioUSD?.toStringAsFixed(0) ?? '-'} USD)',
+                    '\$${listing.precioUYU?.toStringAsFixed(0) ?? '-'} UYU  ',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
