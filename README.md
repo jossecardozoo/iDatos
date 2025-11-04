@@ -1,4 +1,4 @@
-# Monteroom 🏙️
+# UniDatos 🏙️
 
 Proyecto desarrollado para la materia **Integración de Datos**  
 **Facultad de Ingeniería, Universidad de la República (FIng - Udelar)**  
@@ -11,7 +11,7 @@ Proyecto desarrollado para la materia **Integración de Datos**
 
 ## 📘 Descripción
 
-**Monteroom** es una aplicación desarrollada en **Flutter** que integra información de distintas fuentes inmobiliarias y datasets públicos para facilitar la búsqueda, comparación y recomendación de viviendas en Montevideo.  
+**UniDatos** es una aplicación desarrollada en **Flutter** que integra información de distintas fuentes inmobiliarias y datasets públicos para facilitar la búsqueda, comparación y recomendación de viviendas en Montevideo.  
 Forma parte de un proyecto ETL que aborda la **integración de datos heterogéneos** (HTML, JSON, CSV, GPKG) provenientes de portales como **Mercado Libre**, **Gallito Luis** e **InfoCasas**, además de fuentes abiertas de la Intendencia de Montevideo (proximidad a servicios, seguridad, transporte, etc.).
 
 ---

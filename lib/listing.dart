@@ -32,7 +32,6 @@ class Listing {
   final String url;
   final String? barrio;
   final double? precioUYU;
-  final double? precioUSD;
   final double? sup;
   final int? dorms;
   final List<double> coords;
@@ -46,7 +45,6 @@ class Listing {
     required this.url,
     this.barrio,
     this.precioUYU,
-    this.precioUSD,
     this.sup,
     this.dorms,
     required this.coords,
@@ -61,7 +59,6 @@ class Listing {
     url: j['url'] as String,
     barrio: j['barrio'] as String?,
     precioUYU: (j['precioUYU'] as num?)?.toDouble(),
-    precioUSD: (j['precioUSD'] as num?)?.toDouble(),
     sup: (j['sup'] as num?)?.toDouble(),
     dorms: j['dorms'] as int?,
     indicadores: j['indicadores'] != null

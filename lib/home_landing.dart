@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'listings_page.dart';
+import '../../listing.dart';
+import 'listing_repository.dart';
+import 'widgets/listing_card.dart';
 
 enum Operacion { venta, alquiler, temporal, proyectos }
 
@@ -15,6 +18,19 @@ class _HomeLandingState extends State<HomeLanding> {
   String _tipoProp = 'Casa';
   final tipos = const ['Casa', 'Apartamento', 'PH', 'Dúplex', 'Oficina'];
 
+  final _repo = ListingRepository();
+  late Future<List<Listing>> _futureHome;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureHome = _loadHomeListings();
+  }
+
+  Future<List<Listing>> _loadHomeListings() {
+    return _repo.getAll(q: null, tipoOperacion: op, tipoPropiedad: _tipoProp);
+  }
+
   @override
   void dispose() {
     _ubicacionCtrl.dispose();
@@ -28,28 +44,16 @@ class _HomeLandingState extends State<HomeLanding> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MONTEROOM',
+          'UNIDATOS',
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w800,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.person_outline),
-            tooltip: 'Perfil',
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.map_outlined),
-            tooltip: 'Mapa',
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.help_outline),
-            tooltip: 'Ayuda',
-          ),
-          const SizedBox(width: 8),
+        actions: const [
+          _TopIcon(icon: Icons.person_outline, tooltip: 'Perfil'),
+          _TopIcon(icon: Icons.map_outlined, tooltip: 'Mapa'),
+          _TopIcon(icon: Icons.help_outline, tooltip: 'Ayuda'),
+          SizedBox(width: 8),
         ],
       ),
 
@@ -62,7 +66,7 @@ class _HomeLandingState extends State<HomeLanding> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF103C49), Color(0xFF0B4F59)], // teal oscuro
+                colors: [Color(0xFF103C49), Color(0xFF0B4F59)],
               ),
             ),
             child: Center(
@@ -75,7 +79,13 @@ class _HomeLandingState extends State<HomeLanding> {
                     children: [
                       _TabsOperacion(
                         value: op,
-                        onChanged: (v) => setState(() => op = v),
+                        onChanged: (v) {
+                          setState(() {
+                            op = v;
+                            _futureHome =
+                                _loadHomeListings(); // refresca listado
+                          });
+                        },
                       ),
                       const SizedBox(height: 16),
 
@@ -116,9 +126,12 @@ class _HomeLandingState extends State<HomeLanding> {
                                         ),
                                       )
                                       .toList(),
-                                  onChanged: (v) => setState(
-                                    () => _tipoProp = v ?? _tipoProp,
-                                  ),
+                                  onChanged: (v) {
+                                    setState(() {
+                                      _tipoProp = v ?? _tipoProp;
+                                      _futureHome = _loadHomeListings();
+                                    });
+                                  },
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -131,11 +144,11 @@ class _HomeLandingState extends State<HomeLanding> {
                                         'Buscá por ubicación o palabra clave',
                                     prefixIcon: Icon(Icons.search),
                                   ),
+                                  onSubmitted: (_) => _onBuscar(),
                                 ),
                               ),
                               const SizedBox(width: 10),
 
-                              // Botón Buscar coral
                               SizedBox(
                                 height: 48,
                                 child: FilledButton.icon(
@@ -154,24 +167,92 @@ class _HomeLandingState extends State<HomeLanding> {
               ),
             ),
           ),
-          const Expanded(child: SizedBox()),
+
+          Expanded(
+            child: Container(
+              color: const Color(0xFFF5F7FA),
+              child: FutureBuilder<List<Listing>>(
+                future: _futureHome,
+                builder: (context, snap) {
+                  if (snap.connectionState != ConnectionState.done) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snap.hasError) {
+                    return _EmptyState(
+                      icon: Icons.error_outline,
+                      title: 'Ocurrió un error',
+                      subtitle: 'Tocá para reintentar.',
+                      action: () => setState(() {
+                        _futureHome = _loadHomeListings();
+                      }),
+                      actionLabel: 'Reintentar',
+                    );
+                  }
+                  final list = snap.data ?? const <Listing>[];
+                  if (list.isEmpty) {
+                    return _EmptyState(
+                      icon: Icons.home_work_outlined,
+                      title: 'Sin resultados por ahora',
+                      subtitle:
+                          'Actualizá para cargar destacados o realizá una búsqueda.',
+                      action: () => setState(() {
+                        _futureHome = _loadHomeListings();
+                      }),
+                      actionLabel: 'Actualizar',
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {
+                        _futureHome = _loadHomeListings();
+                      });
+                      await _futureHome;
+                    },
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 8,
+                      ),
+                      itemCount: list.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 6),
+                      itemBuilder: (context, i) =>
+                          ListingCard(listing: list[i]),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   void _onBuscar() {
+    final query = _ubicacionCtrl.text.trim().isEmpty
+        ? null
+        : _ubicacionCtrl.text.trim();
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ListingsPage(
-          initialQuery: _ubicacionCtrl.text.trim().isEmpty
-              ? null
-              : _ubicacionCtrl.text.trim(),
+          initialQuery: query,
           initialTipoOperacion: op,
           initialTipoPropiedad: _tipoProp,
         ),
       ),
     );
+  }
+}
+
+class _TopIcon extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  const _TopIcon({required this.icon, required this.tooltip});
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(onPressed: () {}, icon: Icon(icon), tooltip: tooltip);
   }
 }
 
@@ -208,6 +289,55 @@ class _TabsOperacion extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         );
       }).toList(),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback action;
+  final String actionLabel;
+
+  const _EmptyState({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.action,
+    required this.actionLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      children: [
+        const SizedBox(height: 8),
+        Center(
+          child: Column(
+            children: [
+              Icon(icon, size: 48, color: Colors.black.withOpacity(.45)),
+              const SizedBox(height: 10),
+              Text(title, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 6),
+              Text(
+                subtitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: action,
+                icon: const Icon(Icons.refresh),
+                label: Text(actionLabel),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

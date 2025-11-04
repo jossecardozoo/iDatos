@@ -9,7 +9,7 @@ class MonteroomApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MONTEROOM',
+      title: 'UNIDATOS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       home: const HomeLanding(),
