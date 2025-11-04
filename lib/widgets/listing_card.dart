@@ -65,7 +65,7 @@ class ListingCard extends StatelessWidget {
                         fg: const Color(0xFF1D4ED8),
                       ),
                       _pill(
-                        listing.fuente,
+                        listing.fuente ?? "Gallito Luis",
                         bg: const Color(0xFFFFF1F2),
                         fg: const Color(0xFFDC2626),
                       ),
