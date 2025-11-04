@@ -4,6 +4,15 @@ import pandas as pd
 import re
 import time
 
+# METADATA del script
+METADATA = {
+    "name": "mercadolibre_scraper",
+    "description": "Scraper de alquileres desde MercadoLibre Uruguay. Extrae título, ubicación, precio, dorms, baños, superficie, imagen y URL.",
+    "author": "iDatos team",
+    "date_created": "2025-11-04",
+    "version": "1.0",
+}
+
 # --- CONFIGURACIÓN ---
 
 # URL base de alquileres en Mercado Libre Uruguay
@@ -121,6 +130,8 @@ def raspar_pagina_ml(url):
                     "precio_valor": price_value,
                     "precio_moneda": currency,
                     "dorms": dorms,
+                    "banos": banos,
+                    # Compatibilidad con pipelines que usan la clave con tilde
                     "baños": banos,
                     "superficie_m2": metros_cuadrados,
                     "imagen_url": imagen_url,

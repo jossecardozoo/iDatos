@@ -5,6 +5,15 @@ import re  # Necesario para la limpieza con expresiones regulares
 import time
 from pathlib import Path
 
+# METADATA del pipeline de transformaciones
+METADATA = {
+    "name": "script_transformaciones",
+    "description": "ETL de transformaciones: unificación de monedas, geocodificación y limpieza de ubicaciones.",
+    "author": "iDatos team",
+    "date_created": "2025-11-04",
+    "version": "1.0",
+}
+
 # --- CONFIGURACIÓN ETL ---
 
 # Moneda base para la unificación: Peso Uruguayo (UYU)

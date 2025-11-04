@@ -4,6 +4,15 @@ import pandas as pd
 import re
 import time
 
+# METADATA del script
+METADATA = {
+    "name": "infocasas_alquiler_Gallito",
+    "description": "Scraper/parseador para InfoCasas y Gallito (anuncios de alquiler). Extrae título, ubicación, precio, imagen y URL.",
+    "author": "iDatos team",
+    "date_created": "2025-11-04",
+    "version": "1.0",
+}
+
 def extract_listing_data(listing_soup):
     """Extrae los datos de un único elemento BeautifulSoup de un anuncio."""
     data = {}

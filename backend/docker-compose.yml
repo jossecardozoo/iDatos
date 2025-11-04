@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  etl:
+    build: .
+    container_name: idatos_etl
+    volumes:
+      - ./:/app
+      - ./data:/app/data
+    restart: "no"
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: ["python", "-u", "scripts/etl_functions_prefect.py"]
