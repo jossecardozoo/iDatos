@@ -28,8 +28,8 @@ class Indicadores {
 class Listing {
   final String id;
   final String titulo;
-  final String fuente;
-  final String url;
+  final String? fuente;
+  final String? url;
   final String? barrio;
   final double? precioUYU;
   final double? sup;
@@ -41,8 +41,8 @@ class Listing {
   Listing({
     required this.id,
     required this.titulo,
-    required this.fuente,
-    required this.url,
+    this.fuente,
+    this.url,
     this.barrio,
     this.precioUYU,
     this.sup,
@@ -55,8 +55,8 @@ class Listing {
   factory Listing.fromJson(Map<String, dynamic> j) => Listing(
     id: j['id'] as String,
     titulo: j['titulo'] as String,
-    fuente: j['fuente'] as String,
-    url: j['url'] as String,
+    fuente: j['fuente'] as String?,
+    url: j['url'] as String?,
     barrio: j['barrio'] as String?,
     precioUYU: (j['precioUYU'] as num?)?.toDouble(),
     sup: (j['sup'] as num?)?.toDouble(),
