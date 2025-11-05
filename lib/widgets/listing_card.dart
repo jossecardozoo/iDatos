@@ -19,11 +19,13 @@ class ListingCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _HouseThumbnail(
+              imageUrl: listing.imagenUrl,
               semanticLabel:
                   'Imagen del inmueble: ${listing.tipo} en ${listing.barrio ?? 'Barrio no disponible'}',
             ),
             const SizedBox(width: 12),
 
+            // Texto y chips
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -40,6 +42,7 @@ class ListingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
 
+                  // Pills
                   Wrap(
                     spacing: 8,
                     runSpacing: 6,
@@ -50,12 +53,7 @@ class ListingCard extends StatelessWidget {
                         fg: const Color(0xFF0B4F6C),
                       ),
                       _pill(
-                        '${listing.dorms ?? '-'} dorm',
-                        bg: const Color(0xFFF1F5F9),
-                        fg: const Color(0xFF334155),
-                      ),
-                      _pill(
-                        '${listing.sup?.toStringAsFixed(0) ?? '-'} m²',
+                        '${listing.dorms?.toStringAsFixed(0) ?? '-'} dorm',
                         bg: const Color(0xFFF1F5F9),
                         fg: const Color(0xFF334155),
                       ),
@@ -64,23 +62,18 @@ class ListingCard extends StatelessWidget {
                         bg: const Color(0xFFEFF6FF),
                         fg: const Color(0xFF1D4ED8),
                       ),
-                      _pill(
-                        listing.fuente ?? "Gallito Luis",
-                        bg: const Color(0xFFFFF1F2),
-                        fg: const Color(0xFFDC2626),
-                      ),
+                      // Si más adelante exponés superficie o fuente en la API,
+                      // podés reactivar chips similares a estos:
+                      // _pill('${listing.sup?.toStringAsFixed(0)} m²', ...),
+                      // _pill(listing.fuente ?? 'MercadoLibre', ...),
                     ],
                   ),
 
-                  if (listing.indicadores != null) ...[
-                    const SizedBox(height: 8),
-                    _indicadoresRow(listing, context),
-                  ],
-
                   const SizedBox(height: 8),
 
+                  // Precio
                   Text(
-                    '\$${listing.precioUYU?.toStringAsFixed(0) ?? '-'} UYU  ',
+                    '\$${listing.precioUYU?.toStringAsFixed(0) ?? '-'} UYU',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -88,16 +81,21 @@ class ListingCard extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
+                  // Acciones
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // TODO: navegar a mapa usando listing.lat / listing.lon
+                        },
                         child: const Text('Ver en mapa'),
                       ),
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // TODO: lógica de comparar
+                        },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: theme.colorScheme.primary,
                           side: const BorderSide(color: Color(0xFF91A4B7)),
@@ -122,13 +120,44 @@ class ListingCard extends StatelessWidget {
 }
 
 class _HouseThumbnail extends StatelessWidget {
+  final String? imageUrl;
   final String? semanticLabel;
-  const _HouseThumbnail({this.semanticLabel});
+  const _HouseThumbnail({this.imageUrl, this.semanticLabel});
 
   @override
   Widget build(BuildContext context) {
     final surfaceVariant = Theme.of(context).colorScheme.surfaceVariant;
     final onSurface = Theme.of(context).colorScheme.onSurface;
+
+    Widget placeholder = Container(
+      color: surfaceVariant.withOpacity(0.5),
+      child: const AspectRatio(aspectRatio: 1, child: _CenteredHouseIcon()),
+    );
+
+    Widget content;
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      content = placeholder;
+    } else {
+      content = AspectRatio(
+        aspectRatio: 1,
+        child: Image.network(
+          imageUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              size: 28,
+              color: onSurface.withOpacity(0.65),
+            ),
+          ),
+          // Para web esto anda bien; si querés shimmer/placeholder avanzado, usar cached_network_image
+          loadingBuilder: (ctx, child, progress) {
+            if (progress == null) return child;
+            return placeholder;
+          },
+        ),
+      );
+    }
 
     return Semantics(
       label: semanticLabel,
@@ -137,13 +166,8 @@ class _HouseThumbnail extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Container(
           width: 88,
-          // Asegura cuadrado y que no “empuje” al resto
           constraints: const BoxConstraints(minHeight: 88),
-          color: surfaceVariant.withOpacity(0.5),
-          child: const AspectRatio(
-            aspectRatio: 1, // cuadrado
-            child: _CenteredHouseIcon(),
-          ),
+          child: content,
         ),
       ),
     );
@@ -177,71 +201,4 @@ Chip _pill(String text, {required Color bg, required Color fg}) {
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
   );
-}
-
-Widget _indicadoresRow(Listing l, BuildContext context) {
-  final ind = l.indicadores!;
-  final chips = <Widget>[];
-
-  Widget chip(IconData icon, String text, {Color? fg, Color? bg}) {
-    final cFg = fg ?? const Color(0xFF334155);
-    final cBg = bg ?? const Color(0xFFF1F5F9);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: cBg,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: cFg.withOpacity(.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: cFg),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(fontWeight: FontWeight.w600, color: cFg),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color segColor(int s) {
-    if (s < 40) return const Color(0xFFDC2626); // rojo
-    if (s < 70) return const Color(0xFFF59E0B); // ámbar
-    return Colors.green.shade700; // verde
-  }
-
-  if (ind.paradasCercanas != null) {
-    chips.add(chip(Icons.directions_bus, '${ind.paradasCercanas} paradas'));
-  }
-  if (ind.seguridadScore != null) {
-    final c = segColor(ind.seguridadScore!);
-    chips.add(
-      chip(
-        Icons.security,
-        'Seguridad ${ind.seguridadScore}',
-        fg: c,
-        bg: c.withOpacity(.12),
-      ),
-    );
-  }
-  if (ind.hospitalesCerca != null) {
-    chips.add(chip(Icons.local_hospital, '${ind.hospitalesCerca} hospitales'));
-  }
-  if (ind.escuelasCerca != null) {
-    chips.add(chip(Icons.school, '${ind.escuelasCerca} escuelas'));
-  }
-  if (ind.supermercadosCerca != null) {
-    chips.add(
-      chip(Icons.shopping_cart, '${ind.supermercadosCerca} supermercados'),
-    );
-  }
-  if (ind.plazasCerca != null) {
-    chips.add(chip(Icons.park, '${ind.plazasCerca} plazas'));
-  }
-
-  if (chips.isEmpty) return const SizedBox.shrink();
-  return Wrap(spacing: 8, runSpacing: 6, children: chips);
 }
