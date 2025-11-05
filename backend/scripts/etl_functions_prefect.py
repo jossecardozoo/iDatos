@@ -169,7 +169,7 @@ def write_raw_to_sql(df: pd.DataFrame, engine_url: str):
 
         # map lowercase existing to original (to avoid case/accents duplicate issues)
         lower_existing = {c.lower(): c for c in existing_cols}
-        # normalize df column names and, si column exists by lower-case, rename to existing exact
+        # normalize df column names and, if column exists by lower-case, rename to existing exact
         new_cols = []
         for c in df.columns:
             nc = normalize_text(str(c))
@@ -244,19 +244,66 @@ def transform_df(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    # Normalizar nombres de columnas a snake_case simples (lowercase)
+    # Normalize column names early
     df.columns = [normalize_text(str(c)) for c in df.columns]
 
-    # Normalizar precio: buscar posibles columnas precio_valor / price
+    # --- Step 1: Keep only entries in Montevideo ---
+    if 'ubicacion' in df.columns:
+        mask = df['ubicacion'].astype(str).str.lower().str.contains('montevideo')
+        logger.info(f"Filtrando filas: conservando {mask.sum()} de {len(df)} con 'Montevideo' en ubicacion")
+        df = df[mask].reset_index(drop=True)
+        df['ubicacion'] = df['ubicacion'].astype(str).str.replace(r',?\s*montevideo\b', '', flags=re.IGNORECASE, regex=True).str.strip()
+
+    # Also remove the literal 'Montevideo' from titulo if present
+    title_cols = [c for c in df.columns if 'titulo' in c or 'title' in c]
+    if title_cols:
+        tcol = title_cols[0]
+        df[tcol] = df[tcol].astype(str).str.replace(r'\bmontevideo\b', '', flags=re.IGNORECASE, regex=True).str.strip()
+
+    # --- Step 2: Geocoding (before barrio imputation) ---
+    def limpiar_ubicacion_para_geocodificacion(direccion):
+        if not isinstance(direccion, str):
+            return ''
+        parte_principal = direccion.split(',')[0].strip()
+        parte_principal = re.sub(r'\s*/\s*\d+\s*$', '', parte_principal)
+        parte_principal = re.sub(r'\s*Esq\.?\s*', ' and ', parte_principal, flags=re.IGNORECASE)
+        parte_principal = re.sub(r'\s*esquina\s*', ' and ', parte_principal, flags=re.IGNORECASE)
+        parte_principal = re.sub(r'\s{2,}', ' ', parte_principal).strip()
+        return parte_principal.strip()
+
+    df['latitud'] = None
+    df['longitud'] = None
+    try:
+        from geopy.geocoders import Nominatim
+        from geopy.extra.rate_limiter import RateLimiter
+        geolocator = Nominatim(user_agent='idatos_etl_geocoder', timeout=10)
+        geocode_rate = RateLimiter(geolocator.geocode, min_delay_seconds=1.0)
+
+        def try_geocode(ubic):
+            q = limpiar_ubicacion_para_geocodificacion(ubic) + ', Montevideo, Uruguay'
+            try:
+                loc = geocode_rate(q)
+                if loc:
+                    return loc.latitude, loc.longitude
+            except Exception:
+                return None, None
+            return None, None
+
+        for idx, val in df['ubicacion'].astype(str).items():
+            lat, lon = try_geocode(val)
+            df.at[idx, 'latitud'] = lat
+            df.at[idx, 'longitud'] = lon
+    except Exception:
+        logger.info('geopy no disponible o error en geocodificación — continuando sin coordenadas')
+
+    # --- Step 3: Price normalization / numeric extraction ---
     for col in ['precio_valor', 'price', 'valor']:
         if col in df.columns:
-            df['precio_valor_num'] = pd.to_numeric(df[col].str.replace(r"[^0-9]", '', regex=True), errors='coerce')
+            df['precio_valor_num'] = pd.to_numeric(df[col].astype(str).str.replace(r"[^0-9]", '', regex=True), errors='coerce')
             break
     if 'precio_valor_num' not in df.columns:
-        # intentar columnas con combinaciones
-        df['precio_valor_num'] = pd.to_numeric(df.filter(regex='precio|valor|price').iloc[:, 0].astype(str).str.replace(r"[^0-9]", '', regex=True), errors='coerce') if not df.filter(regex='precio|valor|price').empty else pd.Series([None]*len(df))
+        df['precio_valor_num'] = pd.Series([None] * len(df))
 
-    # Detectar moneda si existe
     moneda_col = None
     for c in ['precio_moneda', 'moneda', 'currency']:
         if c in df.columns:
@@ -266,7 +313,6 @@ def transform_df(df: pd.DataFrame) -> pd.DataFrame:
 
     def convertir_a_base(row):
         moneda = str(row.get('precio_moneda_normalizada', 'N/A')).upper().strip()
-        # Normalizar simbolos comunes
         moneda = moneda.replace('$', 'UYU') if moneda == '$' else moneda
         tasa = TASAS_DE_CAMBIO.get(moneda, 1.0)
         val = row.get('precio_valor_num')
@@ -275,10 +321,9 @@ def transform_df(df: pd.DataFrame) -> pd.DataFrame:
         except Exception:
             return None
 
-    # Use a normalized, lower-case column name to avoid case/encoding variants
     df['precio_base_uyu'] = df.apply(convertir_a_base, axis=1)
 
-    # Imputación básica de dormitorios desde título
+    # --- Step 4: Dorms imputation from title ---
     def extraer_dorms(titulo):
         if not isinstance(titulo, str):
             return None
@@ -294,18 +339,59 @@ def transform_df(df: pd.DataFrame) -> pd.DataFrame:
             return map_num.get(m2.group(1), None)
         return None
 
-    title_cols = [c for c in df.columns if 'titulo' in c or 'title' in c]
     if title_cols:
         df['dorms_imputado'] = df[title_cols[0]].apply(extraer_dorms)
-
-    # Normalizar barrio extraído de ubicacion
-    if 'ubicacion' in df.columns:
-        df['barrio_guess'] = df['ubicacion'].astype(str).apply(lambda s: [p.strip() for p in s.split(',')][1] if ',' in s else None)
-        df['barrio_guess'] = df['barrio_guess'].astype(str).apply(lambda s: normalize_text(s) if s and s != 'None' else None)
     else:
-        df['barrio_guess'] = None
+        df['dorms_imputado'] = None
 
-    # Final normalization of column names to ensure consistency
+    # --- Step 5: Barrio imputation using denuncias JSON aliases ---
+    barrio_norm = []
+    try:
+        jpath = Path('datos') / 'denuncias_hurtos_por_10000_hab_montevideo.json'
+        if jpath.exists():
+            with open(jpath, 'r', encoding='utf-8') as fh:
+                payload = json.load(fh)
+            data = payload.get('data', {})
+            alias_map = {}
+            label_map = {}
+            for key, item in data.items():
+                label = item.get('label')
+                norm_key = normalize_text(label)
+                label_map[norm_key] = label
+                alias_map[norm_key] = norm_key
+                for a in item.get('aliases', []):
+                    alias_map[normalize_text(a)] = norm_key
+        else:
+            alias_map = {}
+    except Exception:
+        alias_map = {}
+
+    def guess_barrio(ubic, lat, lon):
+        if not isinstance(ubic, str) or not ubic:
+            return None
+        parts = [p.strip() for p in ubic.split(',') if p.strip()]
+        for idx in [0, 1, 2, -1]:
+            if len(parts) > idx and idx >= -len(parts):
+                cand = normalize_text(parts[idx])
+                if cand in alias_map:
+                    return alias_map[cand]
+        u_norm = normalize_text(ubic)
+        for a, v in alias_map.items():
+            if a and a in u_norm:
+                return v
+        return None
+
+    for idx, row in df.iterrows():
+        barrio = None
+        ubic = row.get('ubicacion') if 'ubicacion' in df.columns else None
+        lat = row.get('latitud')
+        lon = row.get('longitud')
+        barrio = guess_barrio(ubic, lat, lon)
+        barrio_norm.append(barrio)
+
+    df['barrio_guess'] = barrio_norm
+
+    # Final normalization of column names
     df.columns = [normalize_text(str(c)) for c in df.columns]
     return df
 
