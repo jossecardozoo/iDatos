@@ -96,62 +96,82 @@ Siguientes mejoras sugeridas
 
 
 Descripción paso a paso (qué hace cada script y etapa)
------------------------------------------------------
 
-Aquí se explica con más detalle qué hace cada paso del ETL y las utilidades principales del repositorio. Sirve como referencia rápida para entender el flujo y depurar si hace falta.
+# iDatos — Backend ETL (resumen y pasos implementados)
 
-1. Descubrimiento de CSVs (`discover_csvs` dentro de `scripts/etl_functions_prefect.py`)
-  - Busca los archivos CSV a procesar. Por defecto detecta archivos conocidos del proyecto (ej. `mercadolibre_alquileres*.csv`, `gallito*.csv`, `datos_transformados_final.csv`) y puede ampliarse para aceptar un path.
+Este directorio (`iDatos/backend/`) contiene la implementación canónica del pipeline ETL que carga crudos, transforma y persiste
+datos en un SQLite local (`data/etl_datalake.db`). A continuación describo los pasos ya implementados, cómo ejecutarlos y mejoras pendientes.
 
-2. Carga de CSVs (`load_csv` task)
-  - Lee cada CSV a un DataFrame de pandas.
-  - Añade columnas de metadatos como `__source_file` y `__loaded_at` para trazabilidad.
+## Qué hay en `iDatos/backend/scripts`
 
-3. Creación de tablas canónicas (`create_canonical_tables`)
-  - Antes de la ingesta pre-crea (o recrea) tablas vacías canónicas en la base SQLite: `raw_listings` y `transformed_listings`.
-  - Esto reduce la necesidad de ALTER TABLE excesivos al unificar un esquema base desde la unión de cabeceras de CSV.
+- `mercadolibre_scraper.py`, `gallito_detail_scraper.py`, `infocasas_alquiler_Gallito.py`: scrapers (backend-copies) que producen CSVs de anuncios.
+- `clean_gallito_addresses.py`: normalización de direcciones extraídas de Gallito (genera `*.cleaned.csv`).
+- `geocode_batch.py`, `geocode_batch_improved.py`, `geocode_xyz_retry.py`: etapas de geocodificación por lotes con cache en SQLite (`geocode_cache`).
+- `etl_functions_prefect.py`: flujo Prefect con `etl_flow()` (ingesta + transformaciones) y `full_etl_pipeline()` que orquesta pasos externos.
+- `persist_transformed_concat.py`: reconstrucción atómica/segura de la tabla `transformed_listings` cuando hay esquemas variables.
+- `load_denuncias_crime.py`, `join_crime_to_transformed.py`: carga del JSON de denuncias y mapeo de `barrio -> nivel_criminalidad`.
+- `datos_contextuales.py`: enriquecimiento espacial (distancias a bicis/paradas, etc.) cuando hay geometrías disponibles.
+- `archive_null_coords.py`: mueve o exporta las filas sin coordenadas a la tabla `transformed_listings_no_coords`.
+- utilidades: `db_inspect.py`, `run_py_compile.py`, `prepare_db_schema.py`, entre otras.
 
-4. Escritura de crudos a SQLite (`write_raw_to_sql`)
-  - Normaliza nombres de columnas (snake_case, sin acentos, lowercase) para consistencia.
-  - Detecta columnas faltantes en la tabla SQLite y las agrega con `ALTER TABLE` cuando es necesario (ingesta schema-adaptativa).
-  - Consolida columnas duplicadas que difieren solo en mayúsculas/acentos.
-  - Escribe las filas en la tabla `raw_listings` (append).
+> Nota: los scripts en `iDatos/backend/scripts` son la fuente de verdad; he eliminado las copias duplicadas en el directorio `scripts/` para evitar confusión.
 
-5. Transformaciones principales (`transform_df`)
-  - Ejecuta las transformaciones de negocio y normalizaciones sobre los datos crudos para producir la tabla final:
-    - Geocoding (primer paso): intenta resolver `ubicacion` a `latitud`/`longitud` cuando `geopy` está disponible.
-    - Filtrado por Montevideo: por ahora se conservan filas cuya `ubicacion` contiene la palabra "Montevideo" y se limpia ese sufijo del `titulo` y `ubicacion`.
-    - Normalización de precio: extrae valor numérico y moneda, convierte a `precio_base_uyu` cuando es posible (heurístico de monedas).
-    - Imputación de dormitorios (`dorms_imputado`) a partir del título si falta en la columna original.
-    - `barrio_guess`: imputación de barrio usando el JSON `datos/denuncias_hurtos_por_10000_hab_montevideo.json` (usa aliases y heurísticas sobre `ubicacion`).
-    - Otras transformaciones ligeras tomadas de `scripts/transformaciones/script_transformaciones.py` (normalizaciones adicionales, limpieza de strings, extracción de superficies, etc.).
+## Estado actual (pasos implementados)
 
-6. Escritura de transformados a SQLite (`write_transformed_to_sql`)
-  - Similar a `write_raw_to_sql`: normaliza columnas, agrega columnas faltantes si hacen falta, consolida duplicados y escribe en `transformed_listings`.
+1. Ingesta de CSVs a `raw_listings` en SQLite (tabla adaptativa que añade columnas según los CSVs).
+2. Transformaciones principales (`transform_df`) que producen `transformed_listings`:
+   - Filtrado para Montevideo y limpieza de `ubicacion`/`titulo`.
+   - Extracción y normalización de precios y moneda; conversión a UYU mediante `TASAS_DE_CAMBIO`.
+   - Extracción de dormitorios (`dorms_imputado`) desde el título.
+   - Geocoding básico con `geopy` (si instalado) con cache persistente en `geocode_cache`.
+   - `barrio_guess` usando el JSON de denuncias y alias (con fallback fuzzy via rapidfuzz si está instalado).
+3. Batch geocoding con reintentos y uso de `geocode.xyz` como fallback para casos difíciles.
+4. Archiving de filas sin coordenadas a `transformed_listings_no_coords`.
+5. Loader y join de denuncias por barrio (`barrio_criminalidad`) y unión con transformados (LEFT JOIN) para preservar filas.
+6. Un flujo Prefect `full_etl_pipeline()` que orquesta scrapers, limpieza, geocoding, transformaciones, enriquecimiento y archivado.
 
-7. Unión con denuncias (`scripts/merge_denuncias.py`)
-  - Usa `datos/denuncias_hurtos_por_10000_hab_montevideo.json` y su lista de `aliases` para mapear barrios sobre los CSVs y generar archivos `<csv>_with_denuncias.csv` con las métricas de denuncias unidas.
+## Cómo ejecutar (desde la raíz del repo, Powershell)
 
-8. Inspección de la base (`scripts/db_inspect.py`)
-  - Herramienta de diagnóstico que muestra las tablas, columnas y el conteo de filas en `data/etl_datalake.db`.
+1) Ejecución completa con Prefect (recomendado):
 
-9. Dump a TXT para revisión rápida (`scripts/dump_db_to_txt.py`)
-  - Escribe versiones planas `.txt` de las tablas `raw_listings` y `transformed_listings` para revisión humana rápida.
+```powershell
+python -c "from iDatos.backend.scripts.etl_functions_prefect import full_etl_pipeline; full_etl_pipeline(db_path='', gallito_limit=0, dry_run=False)"
+```
 
-10. Comprobación rápida de sintaxis (`scripts/run_py_compile.py`)
-   - Ejecuta un `py_compile` sobre los módulos críticos para detectar errores de sintaxis antes de ejecutar el ETL.
+2) Dry-run (sin scrapers ni geocoding; útil para validar flujo sin llamadas externas):
 
-11. Contenedores (Docker)
-   - `Dockerfile` y `docker-compose.yml` permiten empaquetar el ETL en un contenedor reproducible. Montar `./data` como volumen para persistir `data/etl_datalake.db`.
+```powershell
+python -c "from iDatos.backend.scripts.etl_functions_prefect import full_etl_pipeline; full_etl_pipeline(db_path='data/tmp_etl_dryrun.db', gallito_limit=0, dry_run=True)"
+```
 
-Salida esperada
----------------
+3) Ejecutar sólo la ingesta/transform (sin Prefect orchestration externa):
 
-- `data/etl_datalake.db`: base SQLite con tablas `raw_listings` (crudos) y `transformed_listings` (datawarehouse).
-- Dumps legibles en `data/*.txt` si ejecutas `scripts/dump_db_to_txt.py`.
+```powershell
+python iDatos/backend/scripts/etl_functions_prefect.py
+```
 
-Consejos rápidos
-----------------
-- Para evitar duplicar CSVs entre el repo raíz y `iDatos/backend`, puedes apuntar `discover_csvs` a una ruta absoluta o relativa común en lugar de copiar archivos.
-- Si quieres geocoding robusto en producción, instala `geopy` y revisa límites y políticas del proveedor (Nominatim u otros). Para cargas grandes, usar un servicio con clave o una base de POI local es recomendable.
+4) Ejecutar el runner secuencial (si prefieres scripts independientes):
+
+```powershell
+python scripts/00_run_full_pipeline.py --dry-run
+```
+
+## Recomendaciones y mejoras pendientes
+
+- Añadir API key y control de rate limits para `geocode.xyz` y/o migrar a un geocodificador con plan (para evitar throttling).
+- Refactorizar `transform_df` para reducir complejidad: dividir en helpers testables y añadir unit tests (pytest).
+- Añadir pruebas automáticas (unit + integration quick smoke) que ejecuten el flujo sobre un mini dataset y verifiquen `transformed_listings`.
+- Mejorar el mapeo de barrios con una lista curada y reglas adicionales (actualmente se usan aliases + fuzzy heuristics).
+
+## Cambios realizados ahora
+
+- Eliminadas copias duplicadas en `scripts/` y consolidado el código activo en `iDatos/backend/scripts/`.
+- Añadido `full_etl_pipeline()` en `etl_functions_prefect.py` para orquestar todo el pipeline bajo Prefect (con `dry_run`).
+
+Si quieres, puedo:
+
+- Mover o renombrar los scripts en `iDatos/backend/scripts` a un esquema numerado `00_*`, `01_*`, ... con nombres descriptivos para que sea fácil seguir el pipeline.
+- Añadir una lista de comandos en este README con ejemplos concretos para cada etapa (scrape, clean, geocode, transform, enrich, archive).
+
+Dime si deseas que realice el renombrado numerado dentro de `iDatos/backend/scripts` ahora; lo puedo hacer y actualizar automáticamente los `run_script(...)` dentro de `etl_functions_prefect.py` para que llamen a los nuevos nombres.
 

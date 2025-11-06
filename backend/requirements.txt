@@ -7,3 +7,4 @@ lxml
 python-dotenv
 # Optional (if you plan to geocode):
 # geopy
+rapidfuzz>=2.14.0
