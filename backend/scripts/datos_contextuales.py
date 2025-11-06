@@ -88,7 +88,6 @@ def enrich_with_contextual_data(df: pd.DataFrame,
 
 
 if __name__ == '__main__':
-    # keep original CLI behavior
     import pandas as pd
     CSV_PATH = 'datos_transformados_final.csv'
     OUT_PATH = 'propiedades_con_distancias.csv'

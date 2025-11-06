@@ -61,9 +61,26 @@ pip install -r requirements.txt
 
 3) Ejecutar el flujo ETL
 
-```python
-from scripts.etl_functions_prefect import etl_flow
-etl_flow()
+**Opción A: Pipeline básico** (procesa CSVs existentes en `data/raw/`):
+```bash
+python scripts/run_etl.py
+```
+
+**Opción B: Pipeline completo** (incluye scrapers y geocodificación):
+```bash
+python scripts/run_full_pipeline.py
+```
+
+**Opciones adicionales para el pipeline completo:**
+```bash
+# Limitar registros de Gallito
+python scripts/run_full_pipeline.py --gallito-limit 50
+
+# Modo dry-run (sin scrapers, solo procesa CSVs existentes)
+python scripts/run_full_pipeline.py --dry-run
+
+# Base de datos personalizada
+python scripts/run_full_pipeline.py --db-path data/custom_db.db
 ```
 
 4) (Opcional) Exportar datos a archivos de texto para visualización
@@ -74,6 +91,9 @@ python scripts/dump_db_to_txt.py
 
 # Exportar solo duplicados cross-portal
 python scripts/export_cross_portal_duplicates.py
+
+# Ver duplicados en consola
+python scripts/view_duplicates.py
 ```
 
 Los archivos se generarán en `data/`:

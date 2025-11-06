@@ -39,6 +39,7 @@ class ProvenanceTracker:
     def start_run(self, flow_name: str, **kwargs) -> str:
         """Inicia un nuevo run y retorna su ID."""
         try:
+            
             ctx = get_run_context()
             if hasattr(ctx, 'flow_run'):
                 self.current_run_id = str(ctx.flow_run.id)

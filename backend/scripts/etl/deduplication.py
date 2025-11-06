@@ -70,12 +70,9 @@ def detect_duplicates_by_coordinates(
     Compara todas las propiedades entre sí y las marca como duplicadas si:
     1. Tienen coordenadas válidas
     2. Las coordenadas son EXACTAMENTE iguales (lat1 == lat2 AND lon1 == lon2)
-    3. Son de DIFERENTES portales (cross-portal) - REQUISITO OBLIGATORIO
+    3. Son de DIFERENTES portales (cross-portal) 
     
     NOTA: Solo detecta y procesa duplicados cross-portal (entre diferentes portales).
-    Los duplicados dentro del mismo portal se ignoran completamente.
-    Solo se consideran duplicados aquellos con coordenadas idénticas,
-    no por proximidad dentro de un umbral de distancia.
     
     Args:
         df: DataFrame con datos transformados (debe tener latitud y longitud)

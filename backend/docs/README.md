@@ -40,14 +40,33 @@ backend/
 
 ### Ejecución Básica
 
-```python
-from scripts.etl_functions_prefect import etl_flow
+El pipeline ETL básico procesa CSVs existentes en `data/raw/`:
 
-# Ejecutar pipeline básico
-etl_flow()
+```bash
+# Ejecutar pipeline básico (usa data/etl_datalake.db por defecto)
+cd backend
+python scripts/run_etl.py
 
 # Con ruta personalizada de base de datos
-etl_flow(sqlite_path="data/custom_db.db")
+python scripts/run_etl.py --db-path data/custom_database.db
+```
+
+### Pipeline Completo
+
+El pipeline completo incluye scrapers y geocodificación:
+
+```bash
+# Ejecutar pipeline completo (incluye scrapers)
+python scripts/run_full_pipeline.py
+
+# Con límite de registros para Gallito
+python scripts/run_full_pipeline.py --gallito-limit 50
+
+# Modo dry-run (sin scrapers ni geocodificación, solo procesa CSVs existentes)
+python scripts/run_full_pipeline.py --dry-run
+
+# Combinar opciones
+python scripts/run_full_pipeline.py --db-path data/test_db.db --gallito-limit 100 --dry-run
 ```
 
 ### Exportar Datos a Texto
@@ -63,19 +82,6 @@ python scripts/export_cross_portal_duplicates.py
 
 # Ver información de duplicados en consola
 python scripts/view_duplicates.py
-```
-
-### Pipeline Completo
-
-```python
-from scripts.etl_functions_prefect import full_etl_pipeline
-
-# Ejecutar pipeline completo (incluye scrapers)
-full_etl_pipeline(
-    db_path="data/etl_datalake.db",
-    gallito_limit=100,  # Opcional: límite de registros
-    dry_run=False
-)
 ```
 
 
