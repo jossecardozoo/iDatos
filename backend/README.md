@@ -1,23 +1,7 @@
 # iDatos — ETL, normalización y carga a SQLite (datalake & datawarehouse)
 
-Este repositorio contiene scrapers, transformaciones y utilidades para integrar anuncios de alquiler
+Esta carpeta contiene scrapers, transformaciones y utilidades para integrar anuncios de alquiler
 (en particular MercadoLibre, Gallito e InfoCasas) y datos auxiliares (ej. denuncias por barrio).
-
-Contenido relevante añadido ahora:
-
-- `datos/denuncias_hurtos_por_10000_hab_montevideo.json`
-  - JSON con `metadata` y `data` donde las claves están normalizadas (snake_case sin acentos).
-  - Cada entrada incluye `label`, `value` y `aliases` para facilitar el matching.
-
-- `scripts/merge_denuncias.py`
-  - Script que une el JSON de denuncias con CSVs de anuncios, generando `<csv>_with_denuncias.csv`.
-
-- `scripts/etl_functions_prefect.py`
-  - Flujo Prefect que:
-    1. Descubre CSVs a procesar (por defecto busca archivos conocidos y/o `*.csv`).
-    2. Carga cada CSV y guarda los datos crudos en SQLite (`data/etl_datalake.db`, tabla `raw_listings`).
-    3. Ejecuta transformaciones (normaliza nombres, geocodifica direcciones, unifica moneda a UYU, enriquece con datos contextuales) y guarda el resultado en la tabla `transformed_listings` (datawarehouse).
-    4. Detecta duplicados cross-portal (solo entre diferentes portales) por coordenadas exactamente iguales y los mueve a la tabla `duplicates_moved`.
 
 ### Scripts de Visualización y Exportación
 
