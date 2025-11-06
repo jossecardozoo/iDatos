@@ -186,7 +186,6 @@ Para cada portal:
 | **Trazabilidad** | Registro de transformaciones y metadatos detallados |
 | **Fiabilidad** | Selección de fuentes oficiales y documentación de procesos |
 | **Completitud** | Imputación de campos faltantes (dormitorios, barrios) |
-| **Actualidad** | Timestamps en todos los registros, versionado de datos |
 
 ### Validaciones Aplicadas
 
