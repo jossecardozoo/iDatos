@@ -9,14 +9,14 @@ Proyecto desarrollado para la materia **Integración de Datos**
 
 ---
 
-## 📘 Descripción
+## Descripción
 
 **UniDatos** es una aplicación desarrollada en **Flutter** y **FastAPI** que integra información de distintas fuentes inmobiliarias y datasets públicos para facilitar la búsqueda, comparación y recomendación de viviendas en Montevideo.  
 Forma parte de un proyecto ETL que aborda la **integración de datos heterogéneos** (HTML, JSON, CSV) provenientes de portales como **Mercado Libre**, **Gallito Luis**, además de fuentes abiertas de la Intendencia de Montevideo (proximidad a servicios, seguridad, transporte, etc.).
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 Centralizar y estandarizar la información de alquiler y venta de propiedades, resolviendo heterogeneidades **sintácticas**, **estructurales**, **temporales** y **espaciales** para obtener: 
 - Visualización de precios, seguridad y servicios cercanos.  
@@ -25,7 +25,7 @@ Centralizar y estandarizar la información de alquiler y venta de propiedades, r
 
 ---
 
-## 🧩 Tecnologías
+##  Tecnologías
 
 - **Frontend:** Flutter  
 - **Backend:** FastAPI  
@@ -37,7 +37,7 @@ Centralizar y estandarizar la información de alquiler y venta de propiedades, r
 
 ---
 
-## 🚀 Ejecución
+##  Ejecución
 
 Clonar el repositorio:
 ```bash

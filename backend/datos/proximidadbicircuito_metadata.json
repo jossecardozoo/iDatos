@@ -1,0 +1,62 @@
+{
+  "dataset_name": "Proximidad a bicicircuitos",
+  "dataset_id": "proximidadbicircuito",
+  "description": "La proximidad a los bicicircuitos es medida como la distancia entre cada Zona Censal y el bicicircuito más cercano, según recorridos del viario urbano (peatonal).",
+  "source": {
+    "name": "Intendencia de Montevideo",
+    "url": "https://ckan-data.montevideo.gub.uy/dataset/8a5a5726-21bb-423e-9726-8b80b17872f5/resource/d460868f-0c52-43a0-a0b6-5320810bb8ef/download/proximidadbicircuito.gpkg",
+    "organization": "Intendencia de Montevideo",
+    "ckan_dataset_id": "8a5a5726-21bb-423e-9726-8b80b17872f5",
+    "ckan_resource_id": "d460868f-0c52-43a0-a0b6-5320810bb8ef"
+  },
+  "format": "GPKG",
+  "license": "No se ha provisto de una licencia",
+  "dates": {
+    "created": "2024-01-23",
+    "last_data_update": "2024-01-23",
+    "last_metadata_update": "2024-04-25"
+  },
+  "fields": [
+    {
+      "name": "CODCOMP_A",
+      "type": "string",
+      "description": "Código de zona censal"
+    },
+    {
+      "name": "DISTANCIABICICIRCUITO_MEAN",
+      "type": "numeric",
+      "description": "Distancia promedio al bicicircuito más cercano por zona censal (en metros)"
+    },
+    {
+      "name": "P_TOT_BICICIRCUITO300M",
+      "type": "integer",
+      "description": "Población de la zona censal con un bicicircuito a menos de 300m"
+    },
+    {
+      "name": "P_TOT_HOM_BICICIRCUITO300M",
+      "type": "integer",
+      "description": "Cantidad de hombres de la zona censal con un bicicircuito a menos de 300m"
+    },
+    {
+      "name": "P_TOT_MUJ_BICICIRCUITO300M",
+      "type": "integer",
+      "description": "Cantidad de mujeres de la zona censal con un bicicircuito a menos de 300m"
+    }
+  ],
+  "spatial_coverage": {
+    "area": "Montevideo, Uruguay",
+    "granularity": "Zona Censal",
+    "coordinate_system": "WGS84"
+  },
+  "usage_in_project": {
+    "purpose": "Enriquecimiento contextual de propiedades inmobiliarias",
+    "integration_method": "Join espacial por zona censal (CODCOMP_A)",
+    "field_mapped": "distancia_bicicircuito",
+    "source_field": "DISTANCIABICICIRCUITO_MEAN"
+  },
+  "data_quality": {
+    "completeness": "Cubre todas las zonas censales de Montevideo",
+    "accuracy": "Medida según recorridos del viario urbano peatonal"
+  }
+}
+

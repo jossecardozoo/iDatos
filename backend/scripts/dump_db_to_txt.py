@@ -1,10 +1,15 @@
 """
-Dump SQLite tables to human-readable TXT files for quick inspection.
-Writes:
- - ../data/raw_listings.txt
- - ../data/transformed_listings.txt
+Exporta tablas SQLite a archivos de texto legibles para inspección rápida.
 
-Run from repo root or directly. The script finds the backend/data path relative to its location.
+Genera los siguientes archivos en data/:
+ - raw_listings.txt: Datos crudos de todos los portales
+ - transformed_listings.txt: Datos transformados y enriquecidos
+
+Ejecutar desde el directorio backend/ o desde la raíz del repositorio.
+El script encuentra automáticamente la ruta data/ relativa a su ubicación.
+
+Uso:
+    python scripts/dump_db_to_txt.py
 """
 from pathlib import Path
 import pandas as pd

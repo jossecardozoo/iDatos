@@ -1,0 +1,190 @@
+Mapa digital que representa la cartografía base de Montevideo, incluyendo amanzanamiento, aceras, espacios públicos, calles, hidrografía, etc. 
+Acceso:https://montevideo.gub.uy/app/geoserver/mapstore-base/capas_base/gwc/service/wmts?service=WMTS&request=GetCapabilities
+Portales inmobiliarios que publican viviendas en Uruguay, incluyendo Mercadolibre, Gallito Luis e InfoCasas.
+Acceso:https://listado.mercadolibre.com.uy/inmuebles/casas/alquiler/
+Acceso:https://www.gallito.com.uy/
+Acceso:https://www.infocasas.com.uy/
+Proximidad de los equipamientos, espacios y servicios de uso diario en relación a las viviendas. Acceso:https://ckan.montevideo.gub.uy/dataset/proximidad-para-la-vida-cotidiana
+Contratos de alquiler vigentes por mes
+Acceso:https://www5.ine.gub.uy/documents/Estadísticaseconómicas/HTML/IAI/Informe_IAI_alquileres.html
+Cantidad de Denuncias de cada delito por año: 
+Acceso:https://www.elobservador.com.uy/nacional/homicidios-no-ceden-el-comienzo-del-ano-cuantas-denuncias-hubo-cada-delito-tu-barrio-n5994356
+Sensación de inseguridad en aquellos barrios en que es más frecuente la violencia letal.
+
+
+
+
+
+
+Introducción
+Actualmente en Montevideo, la información relacionada al mercado inmobiliario se encuentra disponible dispersa en diversas plataformas y organismos, lo que hace que haya heterogeneidad en los formatos, estructuras y niveles de detalle de los datos disponibles. Portales como MercadoLibre, InfoCasas o Gallito Luis publican anuncios con datos de viviendas en venta o alquiler, mientras que fuentes públicas disponen de información complementaria sobre seguridad, servicios, transporte y entorno urbano.
+Esta dispersión y falta de estandarización dificultan el análisis integrado y la toma de decisiones informadas. Debido a estas razones, la propuesta es la implementación de una arquitectura de integración de datos que permita unificar y organizar la información proveniente de distintas fuentes, sin perder la calidad y trazabilidad de los datos utilizados.
+Fuentes
+https://geocode.xyz/api
+
+Criterios utilizados
+
+En el proyecto se aplicaron criterios de calidad y de procedencia (data provenance) para garantizar que la información integrada sea confiable, trazable y útil para la toma de decisiones. Se privilegiaron criterios que facilitaran la auditoría, la reproducibilidad y la reutilización. A continuación se detallan los principales criterios utilizados.
+Fiabilidad 
+Se seleccionaron fuentes con reconocimiento o respaldo institucional. Los portales inmobiliarios (MercadoLibre, InfoCasas y Gallito Luis) son las principales plataformas de publicación en el país, mientras que los datos de contexto (cartografía, proximidad, delitos, bicicendas, paradas de transporte público) provienen de organismos oficiales como la Intendencia de Montevideo. La reputación de la fuente garantiza una base de confianza en la información integrada, reduciendo el riesgo de información errónea o no verificable.
+Fidelidad
+Se procuró mantener la correspondencia entre los datos originales y los procesados. Para ello, las transformaciones realizadas en la capa ETL (limpieza, normalización, geocodificación) fueron registradas, preservando una copia de los datos en bruto en el Data Lake. Esto permite rastrear el origen y validar la exactitud de los resultados obtenidos.
+
+Trazabilidad (Provenance)
+Cada paso de transformación fue documentado para garantizar la posibilidad de reconstruir el origen y evolución de cada dato. Esto se asocia con los principios de data provenance y permite auditar el proceso o revertir ante errores.
+
+Principios FAIR (Findable, Accessible, Interoperable, Reusable)
+La arquitectura de datos fue diseñada considerando los principios FAIR, que orientan a garantizar la localización, accesibilidad, interoperabilidad y reutilización de los datos dentro del sistema.
+Más que una formalidad, estos principios se reflejan en decisiones concretas del diseño:
+Findable (localizables): cada dataset del sistema cuenta con metadatos descriptivos (fuente, fecha, formato, nivel de procesamiento) y un identificador único dentro del repositorio. Esto facilita su búsqueda y seguimiento dentro del flujo ETL y del Data Lake.
+Accessible (accesibles): los datos se almacenan en capas diferenciadas (crudo, procesado, analítico) con políticas de acceso claras. Las fuentes originales se preservan y la documentación permite reproducir cada extracción.
+Interoperable: se adoptaron formatos abiertos y estándar (CSV, JSON, GPKG) y se normalizaron los nombres de atributos y unidades, permitiendo el intercambio fluido entre componentes (ETL, almacenamiento, visualización) y con fuentes externas.
+Reusable (reutilizables): los conjuntos de datos incluyen metadatos sobre su origen, fecha, forma de usarlo y versión del pipeline que los generó. Esto permite reutilizarlos en nuevos análisis sin ambigüedad ni pérdida de contexto.
+Exactitud 
+Los datos fueron normalizados y validados para reflejar la realidad representada en las fuentes. Se corrigieron direcciones incompletas, se unificaron monedas (UYU/USD) para tener todas las propiedades con el precio en UYU y se eliminaron registros inconsistentes.
+Consistencia 
+Se aseguraron formatos y convenciones comunes. Las heterogeneidades sintácticas y estructurales (por ejemplo, diferencias en nombres de barrios o estructuras de archivo) se resolvieron mediante diccionarios de equivalencias y estandarización de atributos.
+Procedencia de datos y temas de calidad
+La procedencia de los datos (data provenance) hace referencia al registro del origen, transformaciones y flujo que sigue cada conjunto desde su fuente hasta su almacenamiento final.
+En esta implementación, la trazabilidad se asegura a través de:
+Registro de fuentes originales: se documentaron URLs, formatos y fechas de extracción de los portales inmobiliarios y datasets públicos.
+Control de versiones: cada conjunto transformado mantiene metadatos sobre cuándo y cómo fue modificado.
+Pipeline ETL documentado: las etapas de extracción, transformación y carga son reproducibles, lo que permite auditar las decisiones tomadas en limpieza, normalización y geocodificación.
+Capas diferenciadas de almacenamiento: el Data Lake conserva los datos crudos (fuente original), mientras que el Data Warehouse guarda los datos procesados, permitiendo volver atrás si se detectan errores.
+Se analizaron y trabajaron los principales atributos de calidad:
+Atributo
+Descripción
+Estrategia aplicada
+Exactitud
+Correspondencia con la realidad.
+Validación cruzada entre fuentes, normalización de direcciones y precios.
+Consistencia
+Uniformidad entre datasets.
+Homogeneización de nombres de barrios, monedas y formatos.
+Trazabilidad (provenance)
+Capacidad de seguir el ciclo de vida del dato.
+Registro de transformaciones y metadatos detallados.
+Fiabilidad
+Confianza en las fuentes y procesos.
+Selección de fuentes oficiales y documentación de transformaciones.
+
+
+Flujo de pasos seguidos:
+Definición de Arquitectura 
+Capa de Ingesta y ETL (Python):
+Extracción (Scraping/APIs/Archivos).
+Transformación (Limpieza, Normalización, Geocodificación, Detección de Duplicados).
+Carga (A las Bases de Datos).
+Capa de Exposición
+Capa de Consumo: Construir la interfaz de usuario.
+Datawarehouse 
+El Data Warehouse constituye el repositorio centralizado y estructurado donde convergen los datos procesados a lo largo del pipeline ETL. Su propósito es ofrecer una fuente única, confiable y optimizada para consultas analíticas y visualizaciones, permitiendo integrar información inmobiliaria con datos contextuales de seguridad, servicios y entorno urbano.
+Este Data Warehouse es el resultado de aplicar transformaciones, limpiezas y enriquecimientos a los datos crudos provenientes de múltiples fuentes. Este componente se encuentra en el centro de la arquitectura de integración de datos, funcionando como fuente principal de la API y de la interfaz de usuario desarrollada. Se definió con un enfoque orientado a la toma de decisiones, aplicando criterios de calidad, trazabilidad y estandarización de los datos.
+
+
+Proceso de Construcción del Data Warehouse
+El proceso completo desde la obtención de datos en bruto hasta su disponibilidad en el Data Warehouse sigue un pipeline ETL (Extracción, Transformación y Carga). A continuación se presentan sus principales etapas.
+Ingesta de datos crudos (Data Lake)
+En esta etapa se recolectan datos desde sus fuentes originales —portales inmobiliarios y datasets públicos— y se almacenan sin modificaciones en un Data Lake. Esto asegura que tanto el contenido como el formato de origen se preserven, facilitando la trazabilidad y la reconstrucción del proceso si fuera necesario.
+Fuentes de datos manejadas:
+Portales inmobiliarios como MercadoLibre, InfoCasas y Gallito Luis: datos de propiedades en venta y alquiler.
+Datos geográficos y de servicios: capas de cartografía base, proximidad a hospitales, escuelas y otros servicios urbanos.
+Datos sociales: seguridad por barrio (denuncias), contratos de alquiler vigentes.
+Datos administrativos: zonas censales, barrios oficiales, límites de secciones.
+Scraping y Extracción de Datos
+Para las fuentes que no disponen de una API pública, como Gallito.com.uy y MercadoLibre.com.uy, se desarrollaron procesos de web scraping automatizados en Python, orientados a la recolección periódica de anuncios inmobiliarios de alquiler en Montevideo. Estos procesos operan navegando por múltiples páginas de cada portal, identificando patrones en el HTML e interpretando los elementos relevantes del contenido.
+En el caso de Gallito.com.uy, se extrajeron campos como título, ubicación, precio (valor y moneda), URL del aviso, imagen y fuente original. Para ello, se utilizó análisis estructural del HTML y expresiones regulares, que permiten limpiar valores numéricos y separar el texto útil de los elementos decorativos. La información extraída se almacenó en un DataFrame y fue exportada en formato CSV junto a metadatos sobre fecha de extracción y origen.
+Para MercadoLibre.com.uy se construyó un proceso similar de navegación multipágina, donde se identificaron datos como la ubicación de la propiedad, el valor del alquiler, la superficie, los dormitorios, los baños, entre otros. A partir de estos campos, se aplicó una etapa posterior de enriquecimiento: por ejemplo, cuando el número de dormitorios estaba ausente, se dedujo a partir del título del anuncio mediante técnicas básicas de procesamiento de texto.
+Ambos procesos de scraping hicieron uso de herramientas como BeautifulSoup para el análisis del HTML, expresiones regulares para la estandarización y limpieza de datos, y estructuras de datos como DataFrames para facilitar su posterior transformación. Una vez procesados, los datos fueron exportados en formato CSV y almacenados en el Data Lake, quedando prontos para ser integrados en las siguientes etapas del pipeline de datos.
+Para obtener los datos contextuales se utilizaron archivos que dispone la intendencia en formato gpkg que contiene por zonas censales la parada más cercana expresada en metros y la bicicenda más cercana también expresada en metros, entre otros. A través de un script definido en python se une con un join espacial las coordenadas ya obtenidas de las propiedades scrapeadas con dos capas de un GeoPackage: una con la distancia promedio a paradas (usando el layer_paradas y la columna DistanciaParada_mean) y otra con la distancia a bicicircuitos (usando el layer_bici y la columna DistanciaBicicircuito_mean). A través del script se agregan dos columnas nuevas a los datos: distancia_parada y distancia_bicicircuito. 
+Transformación de Datos (ETL)
+Esta es la etapa crítica del pipeline de integración: aquí los datos crudos se procesan para resolver heterogeneidades, estandarizar las representaciones y enriquecer los conjuntos con información adicional. El objetivo es obtener datasets limpios, consistentes y comparables, listos para ser cargados en el Data Warehouse y consumidos por la aplicación. A continuación se describen las principales tareas realizadas y su modo de implementación:
+
+Limpieza de Datos
+Se corrigieron datos faltantes o inconsistentes, como direcciones incompletas, precios con caracteres no numéricos o campos nulos en atributos clave. Para esto:
+Se eliminó ruido sintáctico (por ejemplo: símbolos de moneda, unidades concatenadas al valor).
+Se tipifican correctamente todas las columnas (números, cadenas, fechas).
+Se eliminaron registros duplicados dentro de cada fuente.
+Esta limpieza permitió homogeneizar el formato de los datos para los siguientes pasos del proceso. Este proceso se lleva a cabo mediante librerías como Pandas (en Python), que permiten manipular y limpiar datos tabulares en estructuras DataFrame.
+Normalización Sintáctica y Semántica
+Ante la presencia de variaciones en nombres de barrios, tipos de propiedad o formatos de cadenas, se implementó una normalización que permitió asegurar que un mismo concepto no se registre de forma diferente entre fuentes. Para ello, se utilizó un diccionario de equivalencias que asignó una representación estandarizada a cada término (“Cordón” en lugar de “Cordon” o “Barrio Cordón”, por ejemplo). Además, se aplicaron operaciones básicas de estandarización de texto como conversión a minúsculas, eliminación de caracteres especiales y ajuste de espacios, permitiendo que los valores se procesaran uniformemente.
+Unificación de monedas
+Para resolver la heterogeneidad en las monedas utilizadas en los anuncios inmobiliarios donde los precios pueden aparecer expresados en pesos uruguayos (UYU), dólares estadounidenses (USD), pesos argentinos (ARS) u otras divisas— se definió un proceso de unificación monetaria con el objetivo de permitir comparaciones directas entre propiedades. Se estableció una moneda base, el peso uruguayo (UYU), y se aplicaron tasas de conversión oficiales vigentes para transformar todos los valores a dicha unidad. Esta normalización permite que todos los precios de las propiedades estén expresados en una misma moneda, facilitando la comparación entre anuncios de distintos portales. Al convertir los valores a pesos uruguayos (UYU) usando una tasa de cambio común, se logra unificar el dato de “precio” y dejarlo listo para ser consultado y analizado dentro del Data Warehouse sin confusiones por diferencias de divisa.
+
+Geocodificación y enriquecimiento espacial
+
+Las direcciones publicadas en los portales inmobiliarios se presentan en formato de texto libre y suelen incluir datos como calles, esquinas, números de apartamento o referencias adicionales. Para poder analizarlas espacialmente, primero se limpiaron dichas direcciones eliminando elementos secundarios que entorpecen su uso como insumo geográfico. Luego, se añadió el contexto “Montevideo, Uruguay” y se utilizaron herramientas de geocodificación, como Nominatim de OpenStreetMap, para obtener las coordenadas (latitud y longitud) correspondientes a cada anuncio. Estas coordenadas se vincularon a capas geográficas oficiales, lo que permitió identificar el barrio o zona censal de cada propiedad y calcular su proximidad a servicios urbanos como la parada de ómnibus más cercana a la propiedad y el bicicircuito más cercano. 
+
+Detección y fusión de duplicados
+Varios anuncios inmobiliarios presentan la misma propiedad publicada en más de un portal, por lo que fue necesario identificar y unificar registros duplicados. Para ello, se compararon atributos clave como dirección, superficie, precio y tipo de propiedad, aplicando técnicas de similitud textual y validación lógica que permitieron determinar cuándo distintos anuncios corresponden al mismo inmueble. Una vez detectadas estas coincidencias, se fusionaron los registros en una sola entrada, conservando los valores más completos o precisos y eliminando redundancias. Este proceso evitó la duplicación de propiedades en el análisis y mejoró la calidad y coherencia de los datos consolidados en el Data Warehouse.
+Trazabilidad y reversión de datos
+Como parte del diseño del proceso ETL, se contempló la posibilidad de retroceder en cualquier etapa para recuperar o reconstruir un dato en su estado original. Esto se logra mediante un esquema de almacenamiento por capas, donde los datos crudos extraídos desde las fuentes se mantienen intactos en el Data Lake, mientras que las versiones transformadas se almacenan por separado antes de ser cargadas al Data Warehouse. Además, cada paso del proceso registra metadatos sobre las transformaciones aplicadas (como fechas, fuente del dato, versión del procesamiento y reglas usadas en la normalización o geocodificación). Gracias a este enfoque, cualquier error identificado en una transformación, o la necesidad de reevaluar una decisión de integración, puede resolverse volviendo a la versión original del dato o a una transformación intermedia, sin comprometer la integridad del sistema global ni requerir una extracción completa de nuevo.
+Estructura del Data Warehouse y Plan de Migración Dimensional
+Estado Actual: Implementación Denormalizada
+Debido a las limitaciones de tiempo en la fase de implementación y con el objetivo de lograr un Producto Mínimo Viable (MVP) funcional, la capa de Data Warehouse (DW) se implementó inicialmente utilizando una estructura denormalizada, consistente en una única tabla.
+
+Esta tabla consolida todos los atributos limpios, transformados y enriquecidos, incluyendo las métricas (precio, superficie) y sus descriptores contextuales (barrio, coordenadas, fuente, fecha de extracción). Esta aproximación facilitó una carga simple y rápida de la fase ETL y permitió el desarrollo inmediato de la API de consumo.
+
+Si bien el modelo de tabla plana es suficiente para las consultas transaccionales o reportes sencillos, presenta desafíos críticos a medida que el volumen de datos aumenta o si se requiere un análisis histórico o complejo:
+
+Redundancia de Datos: Los descriptores de dimensión (ej. nombre completo del barrio o la fuente) se replican en cada fila de la tabla de hechos, consumiendo un espacio de almacenamiento innecesario y ralentizando las operaciones.
+Ineficiencia de Consultas Agregadas: Las consultas que buscan sumarizar o agregar datos (ej. "Precio promedio por barrio y año") se vuelven inherentemente lentas, ya que el motor de la base de datos debe escanear y procesar grandes volúmenes de datos en una única tabla.
+Complejidad en la Gestión Histórica: La administración de cambios en las dimensiones (por ejemplo, si se actualiza la descripción de una zona censal) es muy difícil de manejar en un modelo plano sin perder la trazabilidad histórica de los hechos.
+
+Implementación 
+En el alcance de este proyecto se busca implementar una prueba de concepto para evaluar la viabilidad de las herramientas disponibles incluyendo el proceso de integración de los datos. La implementación del sistema se estructura como una arquitectura modular en capas. A continuación se presenta un diagrama con la estructura de las capas y se detallan las responsabilidades de cada una de ellas. 
+Arquitectura
+Capa Ingesta de Datos
+En esta capa se recoge la información que va a ser utilizada, de las múltiples fuentes de datos disponibles, incluyendo los portales inmobiliarios y los conjuntos de datos públicos provenientes de organismos oficiales. En esta capa se obtienen los datos en bruto, sin realizarles ninguna transformación. 
+Capa de Procesamiento y Transformación
+En esta capa se limpian, normalizan y unifican los datos que se obtuvieron en la etapa anterior. Es donde se corrigen las inconsistencias que se encuentren y se estandarizan las monedas y unidades necesarias, así como el procesamiento de las ubicaciones. Se convierten los datos del Data Lake en información homogénea y estructurada. 
+Capa de Exposición
+Esta capa se agrega para que sea un intermediario entre la capa de almacenamiento y la interfaz de usuario. A través de una API (FastAPI) se exponen los diferentes endpoints que permiten acceder a y modificar los datos. Esta capa permite acceder de forma controlada a los datos procesados del Data Warehouse. Lo que se hace es acceder a la base de datos disponible con SQLite y exponer diferentes endpoints para poder consumir la información. A continuación se describen los endpoints disponibles hasta el momento. 
+1. GET /datos
+Este endpoint permite obtener la lista de propiedades almacenadas en la base de datos. El objetivo es tener un acceso general a los registros procesados, devolviendo un conjunto de objetos con los principales atributos: título, tipo (venta, alquiler), coordenadas geográficas, precio en pesos uruguayos, cantidad de dormitorios y baños, barrio, nivel de criminalidad y distancias a servicios cercanos como paradas o bicicircuitos.
+Admite parámetros opcionales de paginación:
+skip: cantidad de registros a omitir en el caso que se requiera.
+
+
+limit: cantidad máxima de registros a devolver para poder implementar paginacion.
+
+
+De esta forma, es posible consultar los datos de manera segmentada, evitando cargar todo el conjunto a la vez. Por ejemplo, una consulta a /datos?skip=0&limit=10 devuelve las primeras diez propiedades registradas.
+2. GET /datos/{id}
+Este endpoint devuelve la información completa de una propiedad específica, identificada por su campo id, el cual se genera de forma única a partir del título, ubicación y precio del inmueble.Permite acceder al detalle de un registro puntual, que incluye todos sus campos y la informacion. Si el identificador no existe en la base de datos, el sistema responde con un mensaje de error indicando que el recurso no fue encontrado. Por ejemplo, una consulta a /datos/6b3f1e9d2a4f7c6d... devuelve los datos completos de la propiedad correspondiente a ese identificador.
+Capa de Consumo
+En esta capa se tiene una aplicación desarrollada en Flutter. Es la interfaz visual que permite a los usuarios que consumen la aplicación explorar, filtrar y comparar las propiedades, accediendo a información contextual como precios, servicios cercanos y nivel de seguridad del barrio. A continuación se describen las clases principales utilizadas en el desarrollo del sistema. 
+
+ListingRepository: encargada de comunicarse con la API del backend para obtener y actualizar los datos de las propiedades. Gestiona las peticiones HTTP y transforma las respuestas en objetos utilizables dentro de la aplicación.
+
+
+Listing: representa el modelo de datos de una propiedad. Contiene los atributos principales como título, ubicación, precio, cantidad de dormitorios y baños, distancias a servicios, nivel de criminalidad y otros campos contextuales.
+
+MapView: es el componente responsable de mostrar las propiedades sobre un mapa interactivo utilizando la librería flutter_map y los mapas base de OpenStreetMap. Cada propiedad válida se representa mediante un marcador geográfico según sus coordenadas de latitud y longitud.
+Aplicación
+A continuación se muestran diferentes pantallas de la versión de prueba de concepto de la aplicación desarrollada. 
+En la primera imagen se muestra la página principal de la aplicación. Consiste en un navbar con el nombre del sistema (“UNIDATOS”) y tres iconos que se usan para acceder a las diferentes secciones disponibles:
+el ingreso o registro de usuario,
+el acceso directo al mapa con las propiedades disponibles,
+y una sección de ayuda que explica el funcionamiento de la aplicación.
+
+
+Hasta el momento se ha implementado la pantalla del mapa con las propiedades disponibles y la pantalla principal. A futuro se podría implementar la sección de iniciar sesión del usuario, que no sería fundamental para navegar por el sistema, y la sección de ayuda. Debajo está el buscador principal, que es una barra de búsqueda que permite filtrar por tipo de operación (venta, alquiler, alquiler temporal o proyectos) y por tipo de propiedad. Además, el usuario puede escribir una ubicación u otra palabra clave para iniciar la búsqueda, usando el botón destacado “Buscar”. También se tiene la lista de las propiedades sobre las que se puede scrollear buscando una que interese al usuario. 
+
+En la siguiente pantalla se pueden ver las propiedades luego de establecer los filtros y apretar el botón de búsqueda, integrando la información de las diferentes fuentes de datos.
+A la izquierda está la lista de publicaciones, donde cada tarjeta tiene los atributos principales de cada propiedad. Además, se tienen indicadores contextuales como la distancia a la parada más cercana, la distancia a la bici cenda más cercana y la seguridad. A la derecha hay un mapa interactivo que muestra la ubicación geográfica de cada propiedad mediante marcadores. Este mapa permite al usuario explorar visualmente las zonas de Montevideo y analizar la distribución espacial de las oportunidades de vivienda.
+A continuación se muestra una de las cartas que se utilizan como elemento para mostrar las propiedades. Se tienen los datos básicos como el nombre, la ubicación, cantidad de dormitorios, el tipo de propiedad (alquiler, venta, etc.) y el precio en UYU ya que todas las propiedades se unificaron para utilizar la misma moneda. Además se tienen los datos contextuales obtenidos hasta el momento que es la distancia a la parada más cercana, a la bici cenda más cercana y el grado de seguridad. Estos datos fueron obtenidos mediante el proceso de integración de las fuentes mencionadas anteriormente. Por último se tienen dos botones para poder ver la propiedad en el mapa y también para comparar. Por el momento, el botón para comparar no tiene funcionalidad pero podría ser implementada en una segunda iteración del sistema. 
+
+Conclusiones
+Durante el proyecto se integraron datos de diferentes fuentes, lo que generó un nuevo conjunto estructurado de datos inmobiliarios con información contextual añadida. De acuerdo con las buenas prácticas de publicación de datos abiertos y los principios FAIR, los datos resultantes tienen potencial para ser encontrables, accesibles e interoperables.
+Sin embargo, en este caso no todos los datos pueden publicarse como abiertos, ya que los portales inmobiliarios (MercadoLibre, InfoCasas, Gallito Luis) establecen restricciones legales sobre la redistribución de sus contenidos. Por eso, el conjunto completo no puede publicarse en abierto sin vulnerar sus términos de uso.
+
+
+
+
+
+		
+	
+	
+	
+

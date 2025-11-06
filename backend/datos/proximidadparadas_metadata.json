@@ -1,0 +1,63 @@
+{
+  "dataset_name": "Proximidad a paradas de autobús",
+  "dataset_id": "proximidadparadas",
+  "description": "La proximidad a las paradas de autobús, es medida como la distancia de cada zona censal (manzana) a la parada de autobús más cercana según recorridos del viario urbano (peatonal).",
+  "source": {
+    "name": "Intendencia de Montevideo",
+    "url": "https://ckan-data.montevideo.gub.uy/dataset/8a5a5726-21bb-423e-9726-8b80b17872f5/resource/c7e50c5c-0320-4cc2-9749-c876af6c3b53/download/proximidadparadas.gpkg",
+    "organization": "Intendencia de Montevideo",
+    "ckan_dataset_id": "8a5a5726-21bb-423e-9726-8b80b17872f5",
+    "ckan_resource_id": "c7e50c5c-0320-4cc2-9749-c876af6c3b53"
+  },
+  "format": "GPKG",
+  "license": "No se ha provisto de una licencia",
+  "dates": {
+    "created": "2024-01-23",
+    "last_data_update": "2024-01-23",
+    "last_metadata_update": "2024-04-25"
+  },
+  "fields": [
+    {
+      "name": "CODCOMP_A",
+      "type": "string",
+      "description": "Código de zona censal"
+    },
+    {
+      "name": "DISTANCIAPARADA_MEAN",
+      "type": "numeric",
+      "description": "Distancia promedio a la parada de autobús más cercana por zona censal (en metros)"
+    },
+    {
+      "name": "P_TOT_PARADA300M",
+      "type": "integer",
+      "description": "Población de la zona censal con una parada de autobús a menos de 300m"
+    },
+    {
+      "name": "P_TOT_HOM_PARADA300M",
+      "type": "integer",
+      "description": "Cantidad de hombres de la zona censal con una parada de autobús a menos de 300m"
+    },
+    {
+      "name": "P_TOT_MUJ_PARADA300M",
+      "type": "integer",
+      "description": "Cantidad de mujeres de la zona censal con una parada de autobús a menos de 300m"
+    }
+  ],
+  "spatial_coverage": {
+    "area": "Montevideo, Uruguay",
+    "granularity": "Zona Censal (manzana)",
+    "coordinate_system": "WGS84"
+  },
+  "usage_in_project": {
+    "purpose": "Enriquecimiento contextual de propiedades inmobiliarias",
+    "integration_method": "Join espacial por zona censal (CODCOMP_A)",
+    "field_mapped": "distancia_parada",
+    "source_field": "DISTANCIAPARADA_MEAN"
+  },
+  "data_quality": {
+    "completeness": "Cubre todas las zonas censales de Montevideo",
+    "accuracy": "Medida según recorridos del viario urbano peatonal",
+    "update_frequency": "Anual o según actualización de datos censales"
+  }
+}
+

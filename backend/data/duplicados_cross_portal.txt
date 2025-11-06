@@ -1,0 +1,449 @@
+====================================================================================================
+DUPLICADOS CROSS-PORTAL DETECTADOS
+====================================================================================================
+
+Fecha de generación: 2025-11-06 18:58:04
+Total de registros duplicados movidos: 15
+Total de pares de duplicados detectados: 15
+
+====================================================================================================
+RESUMEN EJECUTIVO
+====================================================================================================
+
+Distribución de duplicados cross-portal por fuente:
+----------------------------------------------------------------------------------------------------
+  gallito_alquileres_crudos.csv <-> mercadolibre_alquileres.csv: 4 pares
+  mercadolibre_alquileres.csv <-> mercadolibre_alquileres_con_imagen.csv: 11 pares
+
+
+====================================================================================================
+REGISTROS MOVIDOS A TABLA duplicates_moved
+====================================================================================================
+
+
+====================================================================================================
+Registro #1
+====================================================================================================
+Título: Casa Reciclada A Full En Alquiler En Carrasco
+Ubicación: Carrasco, Carrasco
+Precio (UYU): 10000.0
+Fuente: None
+Archivo origen: mercadolibre_alquileres.csv
+Coordenadas: Lat -34.8855774, Lon -56.0581498
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #2
+====================================================================================================
+Título: Espectacular Casa Reciclada En Carrasco En Venta Y Alquiler
+Ubicación: Carrasco, Carrasco
+Precio (UYU): 10000.0
+Fuente: None
+Archivo origen: mercadolibre_alquileres.csv
+Coordenadas: Lat -34.8855774, Lon -56.0581498
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #3
+====================================================================================================
+Título: Oficina -alquiler World Trade Center -wtc- Buceo
+Ubicación: Buceo
+Precio (UYU): 1600.0
+Fuente: None
+Archivo origen: mercadolibre_alquileres.csv
+Coordenadas: Lat -34.8978004, Lon -56.1286576
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #4
+====================================================================================================
+Título: Oportunidad Única, Casa En La Mejor Zona De Carrasco
+Ubicación: Carrasco
+Precio (UYU): 8000.0
+Fuente: None
+Archivo origen: mercadolibre_alquileres.csv
+Coordenadas: Lat -34.8855774, Lon -56.0581498
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #5
+====================================================================================================
+Título: 2 O 3 Dorm Al Frente Reciclado. Excelente Ubicación
+Ubicación: Paysandú 1164, Centro
+Precio (UYU): 22500.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.9021705, Lon -56.1914174
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #6
+====================================================================================================
+Título: Alquiler De Apartamento Tipo Duplex Dos Dormitorios En Calle La Paz. Cordón. Villa Muñoz
+Ubicación: La Paz 2016, Cordón
+Precio (UYU): 27000.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.8946175, Lon -56.1758226
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #7
+====================================================================================================
+Título: Apt. Totalmente Remodelado,sin Gastos Comunes, Cercanias De Avd Gral.flores, Facultad Medicina, Quimica, Mam, Zona Mayorista, Exlocomoción, Todos Los Servicios
+Ubicación: Dr. Domingo Aramburu 1500 - 1800, Goes
+Precio (UYU): 27500.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.882953, Lon -56.1813859
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #8
+====================================================================================================
+Título: Apto 1 Dorm. Muy Buen Estado C/ Luz Natural En Todos Los Ambientes
+Ubicación: Dr José Luis Bado 3171, Villa Dolores
+Precio (UYU): 19900.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.9012459, Lon -56.1471683
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #9
+====================================================================================================
+Título: Centro A Estrenar! Uruguay Y Gaboto P Alto Balcon Muy Luminoso  Gge Fijo!
+Ubicación: Av. Uruguay 1583, Centro
+Precio (UYU): 30000.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.90161, Lon -56.1831079
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #10
+====================================================================================================
+Título: Domingo Aramburu Y José L Terra-un Dormitorio Y Terraza Luc
+Ubicación: DOMINGO ARAMBURU  1686, La Comercial
+Precio (UYU): 15000.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.8831694, Lon -56.1810609
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #11
+====================================================================================================
+Título: Habitaciones Residencia Estudiantil, Coliving
+Ubicación: Soriano 1073, Centro
+Precio (UYU): 9500.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.9078659, Lon -56.1929173
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #12
+====================================================================================================
+Título: Pension, Residencia, Habitaciones,hombres
+Ubicación: Carlos Reyles 1831, La Comercial
+Precio (UYU): 5500.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.8825273, Lon -56.1794443
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #13
+====================================================================================================
+Título: Residencia Estudiantil Femenina / Coliving Estudiantes / Renta De Habitaciones Para Estudiantes
+Ubicación: Simón Bolivar 1200 - 1500, Parque Batlle
+Precio (UYU): 10000.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.9010282, Lon -56.1585733
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #14
+====================================================================================================
+Título: Residencia Pension Hombres Mujeres Impecable Estado Reco
+Ubicación: Carlos Reyles 1831, Aguada
+Precio (UYU): 5500.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.8825273, Lon -56.1794443
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+====================================================================================================
+Registro #15
+====================================================================================================
+Título: Se Alquila Oficina Ciudad Vieja
+Ubicación: Zabala 1379, Ciudad Vieja
+Precio (UYU): 8500.0
+Fuente: MercadoLibre
+Archivo origen: mercadolibre_alquileres_con_imagen.csv
+Coordenadas: Lat -34.904539, Lon -56.2085826
+Fecha de movimiento: 2025-11-06T21:50:35.287124+00:00
+Razón: duplicate_cross_portal_exact_coordinates
+
+
+====================================================================================================
+PARES DE DUPLICADOS DETECTADOS
+====================================================================================================
+
+
+====================================================================================================
+Par #1
+====================================================================================================
+Fuente primaria: gallito_alquileres_crudos.csv
+  - Título: ALQUILER DE OFICINA O LOCAL EN EL CORAZON DE CARRASCO
+  - Ubicación: Carrasco
+  - Coordenadas: Lat -34.8855774, Lon -56.0581498
+
+Fuente duplicada: mercadolibre_alquileres.csv
+  - Título: Espectacular Casa Reciclada En Carrasco En Venta Y Alquiler
+  - Ubicación: Carrasco, Carrasco
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #2
+====================================================================================================
+Fuente primaria: gallito_alquileres_crudos.csv
+  - Título: ALQUILER DE OFICINA O LOCAL EN EL CORAZON DE CARRASCO
+  - Ubicación: Carrasco
+  - Coordenadas: Lat -34.8855774, Lon -56.0581498
+
+Fuente duplicada: mercadolibre_alquileres.csv
+  - Título: Oportunidad Única, Casa En La Mejor Zona De Carrasco
+  - Ubicación: Carrasco
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #3
+====================================================================================================
+Fuente primaria: gallito_alquileres_crudos.csv
+  - Título: ALQUILER DE OFICINA O LOCAL EN EL CORAZON DE CARRASCO
+  - Ubicación: Carrasco
+  - Coordenadas: Lat -34.8855774, Lon -56.0581498
+
+Fuente duplicada: mercadolibre_alquileres.csv
+  - Título: Casa Reciclada A Full En Alquiler En Carrasco
+  - Ubicación: Carrasco, Carrasco
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #4
+====================================================================================================
+Fuente primaria: gallito_alquileres_crudos.csv
+  - Título: HERMOSO APARTAMENTO EN ALQUILER EN ZONA DE BUCEO, 2 DORMITOR
+  - Ubicación: Buceo
+  - Coordenadas: Lat -34.8978004, Lon -56.1286576
+
+Fuente duplicada: mercadolibre_alquileres.csv
+  - Título: Oficina -alquiler World Trade Center -wtc- Buceo
+  - Ubicación: Buceo
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #5
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: 2 O 3 Dorm Al Frente Reciclado. Excelente Ubicación
+  - Ubicación: Paysandú 1164, Centro
+  - Coordenadas: Lat -34.9021705, Lon -56.1914174
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: 2 O 3 Dorm Al Frente Reciclado. Excelente Ubicación
+  - Ubicación: Paysandú 1164, Centro
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #6
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Alquiler De Apartamento Tipo Duplex Dos Dormitorios En Calle La Paz. Cordón. Villa Muñoz
+  - Ubicación: La Paz 2016, Cordón
+  - Coordenadas: Lat -34.8946175, Lon -56.1758226
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Alquiler De Apartamento Tipo Duplex Dos Dormitorios En Calle La Paz. Cordón. Villa Muñoz
+  - Ubicación: La Paz 2016, Cordón
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #7
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Apt. Totalmente Remodelado,sin Gastos Comunes, Cercanias De Avd Gral.flores, Facultad Medicina, Quimica, Mam, Zona Mayorista, Exlocomoción, Todos Los Servicios
+  - Ubicación: Dr. Domingo Aramburu 1500 - 1800, Goes
+  - Coordenadas: Lat -34.882953, Lon -56.1813859
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Apt. Totalmente Remodelado,sin Gastos Comunes, Cercanias De Avd Gral.flores, Facultad Medicina, Quimica, Mam, Zona Mayorista, Exlocomoción, Todos Los Servicios
+  - Ubicación: Dr. Domingo Aramburu 1500 - 1800, Goes
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #8
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Apto 1 Dorm. Muy Buen Estado C/ Luz Natural En Todos Los Ambientes
+  - Ubicación: Dr José Luis Bado 3171, Villa Dolores
+  - Coordenadas: Lat -34.9012459, Lon -56.1471683
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Apto 1 Dorm. Muy Buen Estado C/ Luz Natural En Todos Los Ambientes
+  - Ubicación: Dr José Luis Bado 3171, Villa Dolores
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #9
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Centro A Estrenar! Uruguay Y Gaboto P Alto Balcon Muy Luminoso  Gge Fijo!
+  - Ubicación: Av. Uruguay 1583, Centro
+  - Coordenadas: Lat -34.90161, Lon -56.1831079
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Centro A Estrenar! Uruguay Y Gaboto P Alto Balcon Muy Luminoso  Gge Fijo!
+  - Ubicación: Av. Uruguay 1583, Centro
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #10
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Domingo Aramburu Y José L Terra-un Dormitorio Y Terraza Luc
+  - Ubicación: DOMINGO ARAMBURU  1686, La Comercial
+  - Coordenadas: Lat -34.8831694, Lon -56.1810609
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Domingo Aramburu Y José L Terra-un Dormitorio Y Terraza Luc
+  - Ubicación: DOMINGO ARAMBURU  1686, La Comercial
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #11
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Habitaciones Residencia Estudiantil, Coliving
+  - Ubicación: Soriano 1073, Centro
+  - Coordenadas: Lat -34.9078659, Lon -56.1929173
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Habitaciones Residencia Estudiantil, Coliving
+  - Ubicación: Soriano 1073, Centro
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #12
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Residencia Estudiantil Femenina / Coliving Estudiantes / Renta De Habitaciones Para Estudiantes
+  - Ubicación: Simón Bolivar 1200 - 1500, Parque Batlle
+  - Coordenadas: Lat -34.9010282, Lon -56.1585733
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Residencia Estudiantil Femenina / Coliving Estudiantes / Renta De Habitaciones Para Estudiantes
+  - Ubicación: Simón Bolivar 1200 - 1500, Parque Batlle
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #13
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Residencia Pension Hombres Mujeres Impecable Estado Reco
+  - Ubicación: Carlos Reyles 1831, Aguada
+  - Coordenadas: Lat -34.8825273, Lon -56.1794443
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Pension, Residencia, Habitaciones,hombres
+  - Ubicación: Carlos Reyles 1831, La Comercial
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #14
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Residencia Pension Hombres Mujeres Impecable Estado Reco
+  - Ubicación: Carlos Reyles 1831, Aguada
+  - Coordenadas: Lat -34.8825273, Lon -56.1794443
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Residencia Pension Hombres Mujeres Impecable Estado Reco
+  - Ubicación: Carlos Reyles 1831, Aguada
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+====================================================================================================
+Par #15
+====================================================================================================
+Fuente primaria: mercadolibre_alquileres.csv
+  - Título: Se Alquila Oficina Ciudad Vieja
+  - Ubicación: Zabala 1379, Ciudad Vieja
+  - Coordenadas: Lat -34.904539, Lon -56.2085826
+
+Fuente duplicada: mercadolibre_alquileres_con_imagen.csv
+  - Título: Se Alquila Oficina Ciudad Vieja
+  - Ubicación: Zabala 1379, Ciudad Vieja
+  - Distancia: 0.0 metros
+
+Fecha de detección: 2025-11-06T21:50:33.871953+00:00
+
+
+====================================================================================================
+NOTAS
+====================================================================================================
+
+- Estos duplicados fueron detectados usando coordenadas exactamente iguales (latitud y longitud idénticas)
+- Solo se consideran duplicados cross-portal (entre diferentes portales)
+- Los registros duplicados cross-portal se movieron a la tabla 'duplicates_moved'
+- Los registros permanecen en 'transformed_listings' para análisis
+- Los duplicados dentro del mismo portal no se procesan
+
+Para más información, consultar:
+- Tabla 'duplicates_detected': Metadatos de todos los duplicados detectados
+- Tabla 'duplicates_moved': Registros completos de duplicados cross-portal movidos
+- Tabla 'transformed_listings': Todos los registros transformados

@@ -16,8 +16,21 @@ Contenido relevante añadido ahora:
   - Flujo Prefect que:
     1. Descubre CSVs a procesar (por defecto busca archivos conocidos y/o `*.csv`).
     2. Carga cada CSV y guarda los datos crudos en SQLite (`data/etl_datalake.db`, tabla `raw_listings`).
-    3. Ejecuta transformaciones ligeras (normaliza nombres, convierte precio a numérico, unifica moneda a UYU) y guarda
-       el resultado en la tabla `transformed_listings` (datawarehouse).
+    3. Ejecuta transformaciones (normaliza nombres, geocodifica direcciones, unifica moneda a UYU, enriquece con datos contextuales) y guarda el resultado en la tabla `transformed_listings` (datawarehouse).
+    4. Detecta duplicados cross-portal (solo entre diferentes portales) por coordenadas exactamente iguales y los mueve a la tabla `duplicates_moved`.
+
+### Scripts de Visualización y Exportación
+
+- `scripts/dump_db_to_txt.py`: Exporta tablas principales a archivos de texto legibles
+  - Genera `data/raw_listings.txt` y `data/transformed_listings.txt`
+  - Útil para revisar datos sin necesidad de consultar la base de datos
+
+- `scripts/export_cross_portal_duplicates.py`: Exporta duplicados cross-portal a texto
+  - Genera `data/duplicados_cross_portal.txt` con reporte detallado
+  - Incluye estadísticas y detalles de cada par de duplicados
+
+- `scripts/view_duplicates.py`: Muestra información de duplicados en consola
+  - Consulta y muestra estadísticas de la tabla `duplicates_detected`
 
 - `requirements.txt` — dependencias Python mínimas.
 - `Dockerfile` — imagen para ejecutar el ETL en un contenedor.
@@ -46,7 +59,54 @@ python -m venv .venv; .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-3) Ejecutar el flujo ETL (ejecución local, correrá sequencialmente)
+3) Ejecutar el flujo ETL
+
+```python
+from scripts.etl_functions_prefect import etl_flow
+etl_flow()
+```
+
+4) (Opcional) Exportar datos a archivos de texto para visualización
+
+```bash
+# Exportar todas las tablas
+python scripts/dump_db_to_txt.py
+
+# Exportar solo duplicados cross-portal
+python scripts/export_cross_portal_duplicates.py
+```
+
+Los archivos se generarán en `data/`:
+- `raw_listings.txt`: Datos crudos
+- `transformed_listings.txt`: Datos transformados
+- `duplicados_cross_portal.txt`: Reporte de duplicados entre portales
+
+## Detección de Duplicados
+
+El pipeline detecta **únicamente duplicados cross-portal** (entre diferentes portales):
+
+- **Método**: Comparación por coordenadas exactamente iguales (latitud y longitud idénticas)
+- **Solo cross-portal**: Los duplicados dentro del mismo portal se ignoran
+- **Movimiento**: Los duplicados cross-portal se mueven a la tabla `duplicates_moved`
+- **Preservación**: Todos los registros (incluyendo duplicados del mismo portal) permanecen en `transformed_listings`
+
+## Estructura de Datos
+
+### Tablas de la Base de Datos
+
+- **`raw_listings`**: Datos crudos (Data Lake)
+- **`transformed_listings`**: Datos transformados y enriquecidos (Data Warehouse)
+- **`duplicates_moved`**: Duplicados cross-portal movidos
+- **`duplicates_detected`**: Metadatos de duplicados cross-portal detectados
+- **`geocode_cache`**: Cache de geocodificación
+
+### Archivos de Texto Exportados
+
+Los scripts de exportación generan archivos `.txt` en `data/` para facilitar la revisión:
+
+- `raw_listings.txt`: Vista legible de datos crudos
+- `transformed_listings.txt`: Vista legible de datos transformados
+- `duplicados_cross_portal.txt`: Reporte detallado de duplicados entre portales
 
 ```powershell
 python .\scripts\etl_functions_prefect.py
