@@ -1,4 +1,3 @@
-// lib/widgets/listing_card.dart
 import 'package:flutter/material.dart';
 import '../../listing.dart';
 
@@ -25,10 +24,8 @@ class ListingCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // Texto y chips
             Expanded(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Título
@@ -42,7 +39,7 @@ class ListingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
 
-                  // Pills
+                  // Pills básicas
                   Wrap(
                     spacing: 8,
                     runSpacing: 6,
@@ -62,12 +59,12 @@ class ListingCard extends StatelessWidget {
                         bg: const Color(0xFFEFF6FF),
                         fg: const Color(0xFF1D4ED8),
                       ),
-                      // Si más adelante exponés superficie o fuente en la API,
-                      // podés reactivar chips similares a estos:
-                      // _pill('${listing.sup?.toStringAsFixed(0)} m²', ...),
-                      // _pill(listing.fuente ?? 'MercadoLibre', ...),
                     ],
                   ),
+
+                  // NUEVO: Distancias y seguridad (si vienen)
+                  const SizedBox(height: 8),
+                  _contextChips(listing),
 
                   const SizedBox(height: 8),
 
@@ -88,14 +85,12 @@ class ListingCard extends StatelessWidget {
                     children: [
                       TextButton(
                         onPressed: () {
-                          // TODO: navegar a mapa usando listing.lat / listing.lon
+                          // TODO: usar listing.lat / listing.lon
                         },
                         child: const Text('Ver en mapa'),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          // TODO: lógica de comparar
-                        },
+                        onPressed: () {},
                         style: OutlinedButton.styleFrom(
                           foregroundColor: theme.colorScheme.primary,
                           side: const BorderSide(color: Color(0xFF91A4B7)),
@@ -150,7 +145,6 @@ class _HouseThumbnail extends StatelessWidget {
               color: onSurface.withOpacity(0.65),
             ),
           ),
-          // Para web esto anda bien; si querés shimmer/placeholder avanzado, usar cached_network_image
           loadingBuilder: (ctx, child, progress) {
             if (progress == null) return child;
             return placeholder;
@@ -176,7 +170,6 @@ class _HouseThumbnail extends StatelessWidget {
 
 class _CenteredHouseIcon extends StatelessWidget {
   const _CenteredHouseIcon();
-
   @override
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
@@ -201,4 +194,74 @@ Chip _pill(String text, {required Color bg, required Color fg}) {
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
   );
+}
+
+Widget _contextChips(Listing l) {
+  final chips = <Widget>[];
+
+  String _fmtDist(double m) => m >= 1000
+      ? '${(m / 1000).toStringAsFixed(1)} km'
+      : '${m.toStringAsFixed(0)} m';
+
+  Color _crimeFg(String n) {
+    switch (n.toLowerCase()) {
+      case 'alta':
+        return const Color(0xFFDC2626); // rojo
+      case 'media':
+        return const Color(0xFFF59E0B); // ámbar
+      case 'baja':
+        return Colors.green.shade700; // verde
+      default:
+        return const Color(0xFF334155); // gris
+    }
+  }
+
+  Widget chip(IconData icon, String text, {Color? fg, Color? bg}) {
+    final cFg = fg ?? const Color(0xFF334155);
+    final cBg = bg ?? const Color(0xFFF1F5F9);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: cBg,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: cFg.withOpacity(.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: cFg),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(fontWeight: FontWeight.w600, color: cFg),
+          ),
+        ],
+      ),
+    );
+  }
+
+  if (l.distanciaParada != null) {
+    chips.add(
+      chip(Icons.directions_bus, 'Parada a ${_fmtDist(l.distanciaParada!)}'),
+    );
+  }
+  if (l.distanciaBicicircuito != null) {
+    chips.add(
+      chip(Icons.pedal_bike, 'Bici a ${_fmtDist(l.distanciaBicicircuito!)}'),
+    );
+  }
+  if (l.nivelCriminalidad != null && l.nivelCriminalidad!.isNotEmpty) {
+    final c = _crimeFg(l.nivelCriminalidad!);
+    chips.add(
+      chip(
+        Icons.security,
+        'Seguridad ${l.nivelCriminalidad}',
+        fg: c,
+        bg: c.withOpacity(.12),
+      ),
+    );
+  }
+
+  if (chips.isEmpty) return const SizedBox.shrink();
+  return Wrap(spacing: 8, runSpacing: 6, children: chips);
 }

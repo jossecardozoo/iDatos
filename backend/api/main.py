@@ -8,6 +8,11 @@ import sqlite3
 import hashlib
 import math
 
+from pathlib import Path
+
+API_DIR = Path(__file__).resolve().parent
+DB_PATH = API_DIR.parent / "data" / "etl_datalake.db"
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -22,18 +27,15 @@ class Propiedad(BaseModel):
     id: str
     titulo: str
     tipo: str
-    coords: tuple[float, float] = Field(..., description="(lat, lon)")
+    coords: tuple[float, float]
     precioUYU: Optional[float] = None
-    # Nuevos campos
     dorms: Optional[float] = None
     banos: Optional[float] = None
     imagen_url: Optional[str] = None
-
-
-from pathlib import Path
-
-API_DIR = Path(__file__).resolve().parent
-DB_PATH = API_DIR.parent / "data" / "etl_datalake.db"
+    barrio: Optional[str] = None
+    distancia_parada: Optional[float] = None
+    distancia_bicicircuito: Optional[float] = None
+    nivel_criminalidad: Optional[str] = None
 
 
 def inferir_tipo(source_file: Optional[str]) -> str:
@@ -74,7 +76,11 @@ def cargar_propiedades_desde_sqlite(db_path: Path) -> List[Propiedad]:
               precio_valor_num,
               dorms,
               banos,
-              imagen_url
+              imagen_url,
+              barrio_guess,
+              distancia_parada,
+              distancia_bicicircuito,
+              nivel_criminalidad
             FROM transformed_listings
         """
         df = pd.read_sql_query(query, conn)
@@ -103,7 +109,6 @@ def cargar_propiedades_desde_sqlite(db_path: Path) -> List[Propiedad]:
                 if pd.isna(row.get("precio_base_uyu"))
                 else float(row.get("precio_base_uyu"))
             ),
-            # Nuevos campos
             dorms=_none_if_nan(row.get("dorms")),
             banos=_none_if_nan(row.get("banos")),
             imagen_url=(
@@ -111,6 +116,10 @@ def cargar_propiedades_desde_sqlite(db_path: Path) -> List[Propiedad]:
                 if not pd.isna(row.get("imagen_url"))
                 else None
             ),
+            barrio=row.get("barrio_guess"),
+            distancia_parada=_none_if_nan(row.get("distancia_parada")),
+            distancia_bicicircuito=_none_if_nan(row.get("distancia_bicicircuito")),
+            nivel_criminalidad=row.get("nivel_criminalidad"),
         )
         props.append(prop)
 
