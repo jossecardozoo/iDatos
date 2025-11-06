@@ -85,14 +85,6 @@ Los archivos se generarán en `data/`:
 - `transformed_listings.txt`: Datos transformados
 - `duplicados_cross_portal.txt`: Reporte de duplicados entre portales
 
-## Detección de Duplicados
-
-El pipeline detecta **únicamente duplicados cross-portal** (entre diferentes portales):
-
-- **Método**: Comparación por coordenadas exactamente iguales (latitud y longitud idénticas)
-- **Solo cross-portal**: Los duplicados dentro del mismo portal se ignoran
-- **Movimiento**: Los duplicados cross-portal se mueven a la tabla `duplicates_moved`
-- **Preservación**: Todos los registros (incluyendo duplicados del mismo portal) permanecen en `transformed_listings`
 
 ## Estructura de Datos
 
@@ -104,19 +96,6 @@ El pipeline detecta **únicamente duplicados cross-portal** (entre diferentes po
 - **`duplicates_detected`**: Metadatos de duplicados cross-portal detectados
 - **`geocode_cache`**: Cache de geocodificación
 
-### Archivos de Texto Exportados
-
-Los scripts de exportación generan archivos `.txt` en `data/` para facilitar la revisión:
-
-- `raw_listings.txt`: Vista legible de datos crudos
-- `transformed_listings.txt`: Vista legible de datos transformados
-- `duplicados_cross_portal.txt`: Reporte detallado de duplicados entre portales
-
-```powershell
-python .\scripts\etl_functions_prefect.py
-```
-
-Salida: se crea `data/etl_datalake.db` (SQLite) con tablas `raw_listings` y `transformed_listings`.
 
 
 Ejecutar con Docker (recomendado para reproducibilidad)
@@ -142,24 +121,6 @@ docker-compose up --build
 
 Esto ejecuta `scripts/etl_functions_prefect.py` dentro del contenedor. El archivo `data/etl_datalake.db` quedará en tu carpeta local `./data`.
 
-Notas y limitaciones
---------------------
-
-- El flujo hace transformaciones ligeras (sin geocodificación ni llamadas externas pesadas). Si quieres geocodificar
-  o ejecutar operaciones que requieren red (ej. GeoPy), añade `geopy` a `requirements.txt` y adapta `etl_functions_prefect.py`.
-
-- El script de unión `merge_denuncias.py` usa heurísticas simples para inferir barrios desde el campo `ubicacion`. Para
-  mayor fiabilidad, agrega aliases adicionales en el JSON o habilita fuzzy matching.
-
-- En los scripts existentes se han añadido diccionarios `METADATA` para facilitar orquestación y auditoría.
-
-Siguientes mejoras sugeridas
----------------------------
-
-- Implementar fuzzy matching o un mapeo manual para mejorar el emparejado de barrios.
-
-
-Descripción paso a paso (qué hace cada script y etapa)
 
 # iDatos — Backend ETL (resumen y pasos implementados)
 
@@ -178,21 +139,6 @@ datos en un SQLite local (`data/etl_datalake.db`). A continuación describo los 
 - `archive_null_coords.py`: mueve o exporta las filas sin coordenadas a la tabla `transformed_listings_no_coords`.
 - utilidades: `db_inspect.py`, `run_py_compile.py`, `prepare_db_schema.py`, entre otras.
 
-> Nota: los scripts en `iDatos/backend/scripts` son la fuente de verdad; he eliminado las copias duplicadas en el directorio `scripts/` para evitar confusión.
-
-## Estado actual (pasos implementados)
-
-1. Ingesta de CSVs a `raw_listings` en SQLite (tabla adaptativa que añade columnas según los CSVs).
-2. Transformaciones principales (`transform_df`) que producen `transformed_listings`:
-   - Filtrado para Montevideo y limpieza de `ubicacion`/`titulo`.
-   - Extracción y normalización de precios y moneda; conversión a UYU mediante `TASAS_DE_CAMBIO`.
-   - Extracción de dormitorios (`dorms_imputado`) desde el título.
-   - Geocoding básico con `geopy` (si instalado) con cache persistente en `geocode_cache`.
-   - `barrio_guess` usando el JSON de denuncias y alias (con fallback fuzzy via rapidfuzz si está instalado).
-3. Batch geocoding con reintentos y uso de `geocode.xyz` como fallback para casos difíciles.
-4. Archiving de filas sin coordenadas a `transformed_listings_no_coords`.
-5. Loader y join de denuncias por barrio (`barrio_criminalidad`) y unión con transformados (LEFT JOIN) para preservar filas.
-6. Un flujo Prefect `full_etl_pipeline()` que orquesta scrapers, limpieza, geocoding, transformaciones, enriquecimiento y archivado.
 
 ## Cómo ejecutar (desde la raíz del repo, Powershell)
 
@@ -219,23 +165,3 @@ python iDatos/backend/scripts/etl_functions_prefect.py
 ```powershell
 python scripts/00_run_full_pipeline.py --dry-run
 ```
-
-## Recomendaciones y mejoras pendientes
-
-- Añadir API key y control de rate limits para `geocode.xyz` y/o migrar a un geocodificador con plan (para evitar throttling).
-- Refactorizar `transform_df` para reducir complejidad: dividir en helpers testables y añadir unit tests (pytest).
-- Añadir pruebas automáticas (unit + integration quick smoke) que ejecuten el flujo sobre un mini dataset y verifiquen `transformed_listings`.
-- Mejorar el mapeo de barrios con una lista curada y reglas adicionales (actualmente se usan aliases + fuzzy heuristics).
-
-## Cambios realizados ahora
-
-- Eliminadas copias duplicadas en `scripts/` y consolidado el código activo en `iDatos/backend/scripts/`.
-- Añadido `full_etl_pipeline()` en `etl_functions_prefect.py` para orquestar todo el pipeline bajo Prefect (con `dry_run`).
-
-Si quieres, puedo:
-
-- Mover o renombrar los scripts en `iDatos/backend/scripts` a un esquema numerado `00_*`, `01_*`, ... con nombres descriptivos para que sea fácil seguir el pipeline.
-- Añadir una lista de comandos en este README con ejemplos concretos para cada etapa (scrape, clean, geocode, transform, enrich, archive).
-
-Dime si deseas que realice el renombrado numerado dentro de `iDatos/backend/scripts` ahora; lo puedo hacer y actualizar automáticamente los `run_script(...)` dentro de `etl_functions_prefect.py` para que llamen a los nuevos nombres.
-
