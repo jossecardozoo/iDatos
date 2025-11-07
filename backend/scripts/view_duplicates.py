@@ -2,7 +2,6 @@
 Script para visualizar información de duplicados cross-portal.
 
 Muestra estadísticas y detalles de los duplicados detectados entre diferentes portales.
-Solo muestra duplicados cross-portal (los duplicados del mismo portal se ignoran).
 """
 import sqlite3
 import pandas as pd

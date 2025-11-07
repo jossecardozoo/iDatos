@@ -127,7 +127,7 @@ def integrate_csv(path_csv, meta, value_map, alias_map):
         if 'barrio' in df.columns and pd.notna(row.get('barrio')):
             barrio_key = alias_map.get(normalize_text(row.get('barrio')))
 
-        # 2) If ubicacion column
+        # 2) If ubicacion column 
         if barrio_key is None and 'ubicacion' in df.columns and pd.notna(row.get('ubicacion')):
             barrio_key = guess_barrio_from_ubicacion(row.get('ubicacion'), alias_map)
 
