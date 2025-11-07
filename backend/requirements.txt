@@ -8,3 +8,4 @@ python-dotenv
 # Optional (if you plan to geocode):
 # geopy
 rapidfuzz>=2.14.0
+scikit-learn>=1.0.0

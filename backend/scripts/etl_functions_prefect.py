@@ -135,7 +135,7 @@ def run_script(cmd: str, cwd: Optional[Path] = None):
     retries=1,
     retry_delay_seconds=30
 )
-def etl_flow(sqlite_path: Optional[str] = None):
+def etl_flow(sqlite_path: Optional[str] = None, duplicate_method: str = 'coordinates'):
     """
     Flujo ETL principal con trazabilidad completa.
     
@@ -145,11 +145,16 @@ def etl_flow(sqlite_path: Optional[str] = None):
     3. Detectar y eliminar duplicados por portal
     4. Guardar datos crudos en SQLite
     5. Transformar los datos
-    6. Guardar datos transformados en SQLite
-    7. Finalizar tracking y guardar metadata
+    6. Detectar duplicados cross-portal (según método seleccionado)
+    7. Guardar datos transformados en SQLite
+    8. Finalizar tracking y guardar metadata
     
     Args:
         sqlite_path: Ruta opcional a la base de datos SQLite
+        duplicate_method: Método de detección de duplicados cross-portal
+            - 'coordinates': Detección por coordenadas exactas (default, rápido)
+            - 'dbscan': Detección con DBSCAN (rápido, recomendado)
+            - 'hierarchical': Detección con clustering jerárquico (lento, preciso)
     """
     logger = get_run_logger()
     
@@ -235,13 +240,35 @@ def etl_flow(sqlite_path: Optional[str] = None):
             df_all_transformed = pd.concat(all_transformed_data, ignore_index=True)
             logger.info(f"Total de registros transformados antes de detección de duplicados: {len(df_all_transformed)}")
             
-            # Detectar duplicados por coordenadas AL FINAL (cross-portal)
-            logger.info("Iniciando detección de duplicados por coordenadas (cross-portal)...")
-            df_final, df_duplicates_info, df_duplicates_records = detect_duplicates_by_coordinates(
-                df_all_transformed,
-                distance_threshold=config.DUPLICATE_DISTANCE_THRESHOLD,  # Usar configuración
-                logger=logger
-            )
+            # Detectar duplicados AL FINAL (cross-portal) según método seleccionado
+            if duplicate_method == 'dbscan':
+                logger.info("Iniciando detección de duplicados con DBSCAN (cross-portal)...")
+                from scripts.etl.clustering_fast import detect_duplicates_by_dbscan
+                df_final, df_duplicates_info, df_duplicates_records = detect_duplicates_by_dbscan(
+                    df_all_transformed,
+                    eps=0.3,
+                    min_samples=2,
+                    title_col='titulo',
+                    source_col=None,
+                    logger=logger
+                )
+            elif duplicate_method == 'hierarchical':
+                logger.info("Iniciando detección de duplicados con clustering jerárquico (cross-portal)...")
+                from scripts.etl.clustering import detect_duplicates_by_clustering
+                df_final, df_duplicates_info, df_duplicates_records = detect_duplicates_by_clustering(
+                    df_all_transformed,
+                    similarity_threshold=75.0,
+                    title_col='titulo',
+                    source_col=None,
+                    logger=logger
+                )
+            else:  # 'coordinates' (default)
+                logger.info("Iniciando detección de duplicados por coordenadas (cross-portal)...")
+                df_final, df_duplicates_info, df_duplicates_records = detect_duplicates_by_coordinates(
+                    df_all_transformed,
+                    distance_threshold=config.DUPLICATE_DISTANCE_THRESHOLD,
+                    logger=logger
+                )
             
             # Guardar metadatos de duplicados en tabla separada
             if not df_duplicates_info.empty:
