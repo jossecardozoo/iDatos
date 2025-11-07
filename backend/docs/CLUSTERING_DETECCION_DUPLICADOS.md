@@ -10,7 +10,7 @@ Este documento describe la implementación y resultados de técnicas avanzadas d
 
 El sistema agrupa ofertas que hacen referencia al mismo objeto físico (inmueble) utilizando comparación lexicográfica y un sistema de scoring basado en características relevantes.
 
-**📖 Ver también**: `docs/SCRIPTS_DETECCION_DUPLICADOS.md` para guía de uso de scripts.
+** Ver también**: `docs/SCRIPTS_DETECCION_DUPLICADOS.md` para guía de uso de scripts.
 
 ## Metodología
 
@@ -20,7 +20,7 @@ Agrupar ofertas de alquileres que hacen referencia al mismo inmueble físico, de
 
 ### Métodos Implementados
 
-#### 1. DBSCAN (Recomendado - Método Rápido) ⚡
+#### 1. DBSCAN 
 
 **Ventajas**:
 - **Muy rápido**: Complejidad O(n log n) vs O(n²) del jerárquico
@@ -145,8 +145,8 @@ Para mejorar el rendimiento con grandes volúmenes de datos, se implementa una o
 
 ### Archivos
 
-- **`scripts/etl/clustering_fast.py`**: Módulo DBSCAN (método rápido) ⚡ **RECOMENDADO**
-- **`scripts/etl/clustering.py`**: Módulo de clustering jerárquico (método preciso)
+- **`scripts/etl/clustering_fast.py`**: Módulo DBSCAN *
+- **`scripts/etl/clustering.py`**: Módulo de clustering jerárquico 
 - **`scripts/test_clustering_fast.py`**: Script de prueba para DBSCAN
 - **`scripts/test_clustering.py`**: Script de prueba para clustering jerárquico
 
@@ -348,46 +348,6 @@ python scripts/detect_duplicates_only.py --method hierarchical
 python scripts/detect_duplicates_only.py --method hierarchical --threshold 80.0
 ```
 
-### Integración Programática
-
-Si necesitas integrar en código Python:
-
-#### Opción 1: DBSCAN (Recomendado - Rápido)
-
-```python
-from scripts.etl.clustering_fast import detect_duplicates_by_dbscan
-
-df_final, df_clusters_info, df_duplicates_records = detect_duplicates_by_dbscan(
-    df_all_transformed,
-    eps=0.3,
-    min_samples=2,
-    logger=logger
-)
-```
-
-#### Opción 2: Clustering Jerárquico (Preciso pero Lento)
-
-```python
-from scripts.etl.clustering import detect_duplicates_by_clustering
-
-df_final, df_clusters_info, df_duplicates_records = detect_duplicates_by_clustering(
-    df_all_transformed,
-    similarity_threshold=75.0,
-    logger=logger
-)
-```
-
-#### Opción 3: Coordenadas (Método Original)
-
-```python
-from scripts.etl.deduplication import detect_duplicates_by_coordinates
-
-df_final, df_duplicates_info, df_duplicates_records = detect_duplicates_by_coordinates(
-    df_all_transformed,
-    logger=logger
-)
-```
-
 **Ver documentación completa de scripts**: `docs/SCRIPTS_DETECCION_DUPLICADOS.md`
 
 ## Resultados del Experimento Real
@@ -435,13 +395,6 @@ Se ejecutaron pruebas comparativas entre DBSCAN y Clustering Jerárquico usando 
    - Probar con dataset completo para detectar duplicados reales
    - Comparar resultados con método de coordenadas exactas
 
-## Próximos Pasos
-
-1. **Validación manual**: Revisar muestras de clusters detectados
-2. **Ajuste fino**: Calibrar `eps` y vectores de características según resultados
-3. **Métricas**: Implementar métricas de precisión/recall
-4. **Automatización**: Integrar DBSCAN en pipeline de producción
-5. **Pruebas con dataset completo**: Validar detección de duplicados reales
 
 ## Referencias
 
@@ -454,9 +407,7 @@ Se ejecutaron pruebas comparativas entre DBSCAN y Clustering Jerárquico usando 
 ## Apéndice: Resultados Detallados del Experimento
 
 ### Detalles Técnicos del Experimento
-
-**Fecha de ejecución**: 2025-01-XX  
-**Entorno**: Windows 10, Python 3.13  
+ 
 **Librerías**: scikit-learn 1.7.2, pandas 1.5+, rapidfuzz 2.14.0  
 **Base de datos**: SQLite (etl_datalake.db)
 

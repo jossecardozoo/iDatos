@@ -72,7 +72,7 @@ python scripts/run_etl_with_hierarchical.py --db-path data/custom_database.db --
 - Método: Clustering Jerárquico Bottom-Up
 - Velocidad: **MUY LENTA** (~19 minutos para 200 registros)
 - Precisión: Control fino sobre el proceso de agrupación
-- **⚠️ ADVERTENCIA**: Solo usar para análisis detallado de muestras pequeñas
+- **ADVERTENCIA**: Solo usar para análisis detallado de muestras pequeñas
 
 **Parámetros**:
 - `--threshold`: Umbral de similaridad (default: 75.0)
