@@ -1,0 +1,455 @@
+{
+  "run_id": "7e2be7b2-e2b9-4c97-bfa6-acef5334d597",
+  "flow_name": "etl_flow_prefect",
+  "started_at": "2025-11-07T00:26:13.311309+00:00",
+  "parameters": {
+    "sqlite_path": "data/etl_datalake.db"
+  },
+  "tasks": [
+    {
+      "task_name": "load_csv",
+      "task_run_id": "019a5bb4-f83f-7fa5-ba58-8aa225afdbe1",
+      "timestamp": "2025-11-07T00:26:18.453958+00:00",
+      "input": {
+        "file_path": "data\\raw\\gallito_alquileres_crudos.csv",
+        "file_size_bytes": 161659
+      },
+      "output": {
+        "rows": 640,
+        "columns": 11,
+        "data_hash": "9c4329eb27be0cb9e8edfff0cac19348"
+      },
+      "execution_time_seconds": 0.006453752517700195,
+      "encoding": "utf-8"
+    },
+    {
+      "task_name": "write_raw_to_sql",
+      "task_run_id": "019a5bb4-fd65-7b04-8f2a-432dff1181b8",
+      "timestamp": "2025-11-07T00:26:19.829643+00:00",
+      "input": {
+        "rows": 640,
+        "data_hash": "9c4329eb27be0cb9e8edfff0cac19348"
+      },
+      "output": {
+        "rows_written": 640,
+        "columns_added": [
+          "source_file",
+          "source_path",
+          "loaded_at",
+          "encoding_used"
+        ],
+        "action": "append"
+      },
+      "execution_time_seconds": 0.05682969093322754
+    },
+    {
+      "task_name": "transform_df",
+      "task_run_id": "019a5bb5-02d0-763c-a197-a92a948eb870",
+      "timestamp": "2025-11-07T00:26:23.157838+00:00",
+      "input": {
+        "rows": 640,
+        "data_hash": "995ce1d0c8996eef3490ab85b0d7cd4f"
+      },
+      "output": {
+        "rows": 492,
+        "data_hash": "4bb74b2e3a2b82c8539c415027e729c1",
+        "columns_count": 28,
+        "filters_applied": 148
+      },
+      "execution_time_seconds": 2.0009047985076904
+    },
+    {
+      "task_name": "load_csv",
+      "task_run_id": "019a5bb5-0f35-7463-af4f-050f6d21a819",
+      "timestamp": "2025-11-07T00:26:24.338383+00:00",
+      "input": {
+        "file_path": "data\\raw\\mercadolibre_alquileres.csv",
+        "file_size_bytes": 7292
+      },
+      "output": {
+        "rows": 48,
+        "columns": 11,
+        "data_hash": "0d347c733be11985ab4356cb3bf74414"
+      },
+      "execution_time_seconds": 0.005368709564208984,
+      "encoding": "utf-8"
+    },
+    {
+      "task_name": "write_raw_to_sql",
+      "task_run_id": "019a5bb5-1453-7ad2-933b-7ee8d81f216c",
+      "timestamp": "2025-11-07T00:26:25.641264+00:00",
+      "input": {
+        "rows": 48,
+        "data_hash": "0d347c733be11985ab4356cb3bf74414"
+      },
+      "output": {
+        "rows_written": 48,
+        "columns_added": [],
+        "action": "append"
+      },
+      "execution_time_seconds": 0.01959848403930664
+    },
+    {
+      "task_name": "transform_df",
+      "task_run_id": "019a5bb5-1955-729d-8c2e-2fe4df89e22f",
+      "timestamp": "2025-11-07T00:26:35.699437+00:00",
+      "input": {
+        "rows": 48,
+        "data_hash": "bb2dd8450cf8a38125f5d3cecd46ed5a"
+      },
+      "output": {
+        "rows": 37,
+        "data_hash": "47a95cf8632db457867519a07fcf2001",
+        "columns_count": 28,
+        "filters_applied": 11
+      },
+      "execution_time_seconds": 8.760178089141846
+    },
+    {
+      "task_name": "load_csv",
+      "task_run_id": "019a5bb5-4021-7d30-bccd-531ffa8e6bee",
+      "timestamp": "2025-11-07T00:26:36.841023+00:00",
+      "input": {
+        "file_path": "data\\raw\\mercadolibre_alquileres_con_imagen.csv",
+        "file_size_bytes": 56722
+      },
+      "output": {
+        "rows": 237,
+        "columns": 13,
+        "data_hash": "6378a000421b1defb500ed85de78588e"
+      },
+      "execution_time_seconds": 0.004762887954711914,
+      "encoding": "utf-8"
+    },
+    {
+      "task_name": "write_raw_to_sql",
+      "task_run_id": "019a5bb5-4541-7e29-a97b-4f77ef04bf07",
+      "timestamp": "2025-11-07T00:26:38.242258+00:00",
+      "input": {
+        "rows": 237,
+        "data_hash": "6378a000421b1defb500ed85de78588e"
+      },
+      "output": {
+        "rows_written": 237,
+        "columns_added": [],
+        "action": "append"
+      },
+      "execution_time_seconds": 0.022904634475708008
+    },
+    {
+      "task_name": "transform_df",
+      "task_run_id": "019a5bb5-4aa0-784e-9169-f6551010f2c3",
+      "timestamp": "2025-11-07T00:27:22.421289+00:00",
+      "input": {
+        "rows": 237,
+        "data_hash": "b186d983075d2720f3b574d966099923"
+      },
+      "output": {
+        "rows": 146,
+        "data_hash": "f58a2c1ad61b943354d9d7324355ca13",
+        "columns_count": 28,
+        "filters_applied": 91
+      },
+      "execution_time_seconds": 42.861735105514526
+    },
+    {
+      "task_name": "load_csv",
+      "task_run_id": "019a5bb5-f6a0-78df-8184-e0e3ed86e1ea",
+      "timestamp": "2025-11-07T00:27:23.559954+00:00",
+      "input": {
+        "file_path": "mercadolibre_alquileres_con_imagen.csv",
+        "file_size_bytes": 86246
+      },
+      "output": {
+        "rows": 240,
+        "columns": 15,
+        "data_hash": "18256762f794c0fda9e7d477875e77bd"
+      },
+      "execution_time_seconds": 0.005452871322631836,
+      "encoding": "utf-8"
+    },
+    {
+      "task_name": "write_raw_to_sql",
+      "task_run_id": "019a5bb5-fb84-7326-a06e-d3f9b2d1fc61",
+      "timestamp": "2025-11-07T00:27:24.842316+00:00",
+      "input": {
+        "rows": 240,
+        "data_hash": "18256762f794c0fda9e7d477875e77bd"
+      },
+      "output": {
+        "rows_written": 240,
+        "columns_added": [],
+        "action": "append"
+      },
+      "execution_time_seconds": 0.038604736328125
+    },
+    {
+      "task_name": "transform_df",
+      "task_run_id": "019a5bb6-009d-756c-b346-f28de3aa900c",
+      "timestamp": "2025-11-07T00:28:17.964265+00:00",
+      "input": {
+        "rows": 240,
+        "data_hash": "782ccfc9ea618cb6a92caf7bbf65514c"
+      },
+      "output": {
+        "rows": 159,
+        "data_hash": "e1637a60e15061d29fd2d8d10e6c9333",
+        "columns_count": 25,
+        "filters_applied": 81
+      },
+      "execution_time_seconds": 51.813413858413696
+    },
+    {
+      "task_name": "write_transformed_to_sql_final",
+      "task_run_id": null,
+      "timestamp": "2025-11-07T00:28:22.325597+00:00",
+      "input": {
+        "rows": 834
+      },
+      "output": {
+        "rows_written": 834,
+        "action": "replace",
+        "duplicates_moved": 23
+      },
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "write_transformed_to_sql",
+      "task_run_id": "019a5bb6-e0ce-7f28-8b3f-ae495c3a515c",
+      "timestamp": "2025-11-07T00:28:23.553099+00:00",
+      "input": {
+        "rows": 834,
+        "data_hash": "c61d30cff43fc723fb8b0156ccb704d2"
+      },
+      "output": {
+        "rows_written": 834,
+        "columns_added": [],
+        "action": "append"
+      },
+      "execution_time_seconds": 0.03444170951843262
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5bb6-e5fe-77ad-b919-060689abf974",
+      "timestamp": "2025-11-07T00:28:24.830130+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE \"C:/Users/CaroH/Documents/fing/IntegracionDatos/iDatos/backend/scripts/07_load_denuncias_crime.py\" --db data/etl_datalake.db",
+        "cwd": "C:\\Users\\CaroH\\Documents\\fing\\IntegracionDatos\\iDatos\\backend"
+      },
+      "output": {},
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5bb6-ee74-74c7-954c-5235cf8cafc3",
+      "timestamp": "2025-11-07T00:28:27.144241+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE \"C:/Users/CaroH/Documents/fing/IntegracionDatos/iDatos/backend/scripts/08_join_crime_to_transformed.py\" --db data/etl_datalake.db",
+        "cwd": "C:\\Users\\CaroH\\Documents\\fing\\IntegracionDatos\\iDatos\\backend"
+      },
+      "output": {},
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5bb6-f95e-735f-af26-3700a44f5e7c",
+      "timestamp": "2025-11-07T00:28:29.881183+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE \"C:/Users/CaroH/Documents/fing/IntegracionDatos/iDatos/backend/scripts/09_archive_null_coords.py\" --db data/etl_datalake.db --move",
+        "cwd": "C:\\Users\\CaroH\\Documents\\fing\\IntegracionDatos\\iDatos\\backend"
+      },
+      "output": {},
+      "execution_time_seconds": null
+    }
+  ],
+  "statistics": {
+    "total_rows_raw": 1165,
+    "total_rows_transformed": 834,
+    "total_duplicates_moved": 23,
+    "files_processed": 4
+  },
+  "transformations": [
+    {
+      "operation": "full_transform_pipeline",
+      "source_file": "unknown",
+      "rows_before": 640,
+      "rows_after": 492,
+      "rows_filtered": 148,
+      "columns_added": [
+        "url",
+        "titulo",
+        "ubicacion",
+        "precio_moneda",
+        "precio_valor",
+        "imagen_url",
+        "fuente",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "dorms",
+        "banos",
+        "superficie_m2",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "latitud",
+        "longitud",
+        "distancia_parada",
+        "distancia_bicicircuito",
+        "precio_valor_num",
+        "precio_moneda_normalizada",
+        "precio_base_uyu",
+        "dorms_imputado",
+        "barrio_guess",
+        "nivel_criminalidad"
+      ],
+      "columns_removed": [],
+      "filters_applied": {
+        "montevideo_filter": 148
+      },
+      "timestamp": "2025-11-07T00:26:23.157804+00:00"
+    },
+    {
+      "operation": "full_transform_pipeline",
+      "source_file": "unknown",
+      "rows_before": 48,
+      "rows_after": 37,
+      "rows_filtered": 11,
+      "columns_added": [
+        "titulo",
+        "ubicacion",
+        "precio_valor",
+        "precio_moneda",
+        "dorms",
+        "banos",
+        "superficie_m2",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "url",
+        "imagen_url",
+        "fuente",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "latitud",
+        "longitud",
+        "distancia_parada",
+        "distancia_bicicircuito",
+        "precio_valor_num",
+        "precio_moneda_normalizada",
+        "precio_base_uyu",
+        "dorms_imputado",
+        "barrio_guess",
+        "nivel_criminalidad"
+      ],
+      "columns_removed": [],
+      "filters_applied": {
+        "montevideo_filter": 11
+      },
+      "timestamp": "2025-11-07T00:26:35.699396+00:00"
+    },
+    {
+      "operation": "full_transform_pipeline",
+      "source_file": "unknown",
+      "rows_before": 237,
+      "rows_after": 146,
+      "rows_filtered": 91,
+      "columns_added": [
+        "titulo",
+        "ubicacion",
+        "precio_valor",
+        "precio_moneda",
+        "dorms",
+        "banos",
+        "superficie_m2",
+        "imagen_url",
+        "fuente",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "url",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "latitud",
+        "longitud",
+        "distancia_parada",
+        "distancia_bicicircuito",
+        "precio_valor_num",
+        "precio_moneda_normalizada",
+        "precio_base_uyu",
+        "dorms_imputado",
+        "barrio_guess",
+        "nivel_criminalidad"
+      ],
+      "columns_removed": [],
+      "filters_applied": {
+        "montevideo_filter": 91
+      },
+      "timestamp": "2025-11-07T00:27:22.421248+00:00"
+    },
+    {
+      "operation": "full_transform_pipeline",
+      "source_file": "unknown",
+      "rows_before": 240,
+      "rows_after": 159,
+      "rows_filtered": 81,
+      "columns_added": [
+        "titulo",
+        "ubicacion",
+        "precio_valor",
+        "precio_moneda",
+        "dorms",
+        "banos",
+        "banos",
+        "superficie_m2",
+        "imagen_url",
+        "fuente",
+        "url",
+        "source_file",
+        "source_path",
+        "loaded_at",
+        "encoding_used",
+        "latitud",
+        "longitud",
+        "distancia_parada",
+        "distancia_bicicircuito",
+        "precio_valor_num",
+        "precio_moneda_normalizada",
+        "precio_base_uyu",
+        "dorms_imputado",
+        "barrio_guess",
+        "nivel_criminalidad"
+      ],
+      "columns_removed": [],
+      "filters_applied": {
+        "montevideo_filter": 81
+      },
+      "timestamp": "2025-11-07T00:28:17.964210+00:00"
+    }
+  ],
+  "duplicate_detections": [
+    {
+      "source": "cross_portal_coordinates",
+      "total_rows": 834,
+      "duplicates_found": 23,
+      "unique_rows": 811,
+      "method": "exact_coordinates",
+      "similarity_threshold": 0.0,
+      "timestamp": "2025-11-07T00:28:19.186674+00:00",
+      "execution_time": 0.06646418571472168,
+      "cross_portal_count": 23,
+      "duplicates_moved": 23
+    }
+  ],
+  "ended_at": "2025-11-07T00:28:31.223190+00:00",
+  "status": "completed",
+  "duration_seconds": 137.911904
+}

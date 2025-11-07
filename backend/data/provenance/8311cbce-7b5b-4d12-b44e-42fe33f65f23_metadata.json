@@ -1,0 +1,83 @@
+{
+  "run_id": "8311cbce-7b5b-4d12-b44e-42fe33f65f23",
+  "flow_name": "full_etl_pipeline_prefect",
+  "started_at": "2025-11-06T23:09:24.794123+00:00",
+  "parameters": {
+    "db_path": null,
+    "gallito_limit": 0,
+    "dry_run": false
+  },
+  "tasks": [
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5b6e-95b4-76b2-a776-2c0342eb696c",
+      "timestamp": "2025-11-06T23:09:28.126526+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py"
+      },
+      "output": {},
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5b6e-95b4-76b2-a776-2c0342eb696c",
+      "timestamp": "2025-11-06T23:09:28.223828+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py"
+      },
+      "output": {
+        "error": "Command 'C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py' returned non-zero exit status 2."
+      },
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5b6e-95b4-76b2-a776-2c0342eb696c",
+      "timestamp": "2025-11-06T23:09:38.243748+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py"
+      },
+      "output": {},
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5b6e-95b4-76b2-a776-2c0342eb696c",
+      "timestamp": "2025-11-06T23:09:38.315965+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py"
+      },
+      "output": {
+        "error": "Command 'C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py' returned non-zero exit status 2."
+      },
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5b6e-95b4-76b2-a776-2c0342eb696c",
+      "timestamp": "2025-11-06T23:09:48.333008+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py"
+      },
+      "output": {},
+      "execution_time_seconds": null
+    },
+    {
+      "task_name": "run_script",
+      "task_run_id": "019a5b6e-95b4-76b2-a776-2c0342eb696c",
+      "timestamp": "2025-11-06T23:09:48.396613+00:00",
+      "input": {
+        "command": "C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py"
+      },
+      "output": {
+        "error": "Command 'C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py' returned non-zero exit status 2."
+      },
+      "execution_time_seconds": null
+    }
+  ],
+  "statistics": {},
+  "ended_at": "2025-11-06T23:09:48.835395+00:00",
+  "status": "failed",
+  "error": "Command 'C:\\Users\\CaroH\\AppData\\Local\\Programs\\Python\\Python313\\python.EXE iDatos/backend/scripts/01_mercadolibre_scraper.py' returned non-zero exit status 2.",
+  "duration_seconds": 24.041301
+}

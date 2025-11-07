@@ -96,61 +96,68 @@ def load_csv(path: Path) -> pd.DataFrame:
 @task(
     name="create_canonical_tables",
     log_prints=True,
-    tags=["setup", "database"]
+    tags=["setup", "database"],
+    cache_policy=None  # Deshabilitar caché - objetos Engine no son serializables
 )
-def create_canonical_tables(engine, csv_paths: List[Path], transform_func=None):
+def create_canonical_tables(engine_url: str, csv_paths: List[Path], transform_func=None):
     """
     Task de Prefect para crear tablas canónicas vacías.
     
     Args:
-        engine: SQLAlchemy engine
+        engine_url: URL de conexión a la base de datos (string)
         csv_paths: Lista de paths a CSVs para inferir esquema
         transform_func: Función opcional para inferir esquema transformado
     """
     logger = get_run_logger()
     logger.info("Creando tablas canónicas...")
     
-    # Unión de columnas raw
-    raw_cols = []
-    for p in csv_paths:
-        try:
-            cols = read_csv_header(p)
-        except Exception as e:
-            logger.warning(f"No se pudo leer header de {p}: {e}")
-            cols = []
-        for c in cols:
-            nc = normalize_text(str(c))
-            if nc not in raw_cols:
-                raw_cols.append(nc)
+    # Crear engine desde la URL
+    engine = create_engine(engine_url)
+    
+    try:
+        # Unión de columnas raw
+        raw_cols = []
+        for p in csv_paths:
+            try:
+                cols = read_csv_header(p)
+            except Exception as e:
+                logger.warning(f"No se pudo leer header de {p}: {e}")
+                cols = []
+            for c in cols:
+                nc = normalize_text(str(c))
+                if nc not in raw_cols:
+                    raw_cols.append(nc)
 
-    # Asegurar columnas de metadata
-    for extra in ['__source_file', '__source_path', '__loaded_at', '__encoding_used']:
-        if extra not in raw_cols:
-            raw_cols.append(extra)
+        # Asegurar columnas de metadata
+        for extra in ['__source_file', '__source_path', '__loaded_at', '__encoding_used']:
+            if extra not in raw_cols:
+                raw_cols.append(extra)
 
-    # Crear tabla raw vacía
-    df_empty_raw = pd.DataFrame(columns=raw_cols)
-    df_empty_raw.to_sql('raw_listings', engine, if_exists='replace', index=False)
-    logger.info(f"Tabla raw_listings creada con {len(raw_cols)} columnas")
+        # Crear tabla raw vacía
+        df_empty_raw = pd.DataFrame(columns=raw_cols)
+        df_empty_raw.to_sql('raw_listings', engine, if_exists='replace', index=False)
+        logger.info(f"Tabla raw_listings creada con {len(raw_cols)} columnas")
 
-    # Inferir esquema transformado
-    df_for_transform = pd.DataFrame(columns=raw_cols)
-    if transform_func:
-        try:
-            df_transformed_sample = transform_func(df_for_transform)
-            trans_cols = [normalize_text(str(c)) for c in df_transformed_sample.columns.tolist()]
-        except Exception as e:
-            logger.warning(f"Error inferiendo esquema transformado: {e}")
+        # Inferir esquema transformado
+        df_for_transform = pd.DataFrame(columns=raw_cols)
+        if transform_func:
+            try:
+                df_transformed_sample = transform_func(df_for_transform)
+                trans_cols = [normalize_text(str(c)) for c in df_transformed_sample.columns.tolist()]
+            except Exception as e:
+                logger.warning(f"Error inferiendo esquema transformado: {e}")
+                trans_cols = ['url', 'titulo', 'ubicacion', 'precio_moneda', 'precio_valor', 'imagen_url', 'fuente']
+        else:
             trans_cols = ['url', 'titulo', 'ubicacion', 'precio_moneda', 'precio_valor', 'imagen_url', 'fuente']
-    else:
-        trans_cols = ['url', 'titulo', 'ubicacion', 'precio_moneda', 'precio_valor', 'imagen_url', 'fuente']
 
-    # Asegurar columnas únicas preservando orden
-    seen = set()
-    trans_cols_unique = [x for x in trans_cols if not (x in seen or seen.add(x))]
-    df_empty_trans = pd.DataFrame(columns=trans_cols_unique)
-    df_empty_trans.to_sql('transformed_listings', engine, if_exists='replace', index=False)
-    logger.info(f"Tabla transformed_listings creada con {len(trans_cols_unique)} columnas")
+        # Asegurar columnas únicas preservando orden
+        seen = set()
+        trans_cols_unique = [x for x in trans_cols if not (x in seen or seen.add(x))]
+        df_empty_trans = pd.DataFrame(columns=trans_cols_unique)
+        df_empty_trans.to_sql('transformed_listings', engine, if_exists='replace', index=False)
+        logger.info(f"Tabla transformed_listings creada con {len(trans_cols_unique)} columnas")
+    finally:
+        engine.dispose()  # Cerrar conexiones
 
 
 @task(

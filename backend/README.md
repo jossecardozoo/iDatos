@@ -50,12 +50,12 @@ pip install -r requirements.txt
 python scripts/run_etl.py
 ```
 
-**Opción B: Pipeline completo** (incluye scrapers y geocodificación):
+**Opción B: Pipeline completo** (incluye scrapers y geocodificación)  (no recomendado):
 ```bash
 python scripts/run_full_pipeline.py
 ```
 
-**Opciones adicionales para el pipeline completo:**
+**Opciones adicionales para el pipeline completo: **
 ```bash
 # Limitar registros de Gallito
 python scripts/run_full_pipeline.py --gallito-limit 50

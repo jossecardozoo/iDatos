@@ -12,6 +12,7 @@ Este script está pensado para poder ejecutarse localmente o dentro de un conten
 from pathlib import Path
 import subprocess
 import shutil
+import glob
 from datetime import datetime
 from typing import Optional
 
@@ -77,28 +78,42 @@ def discover_csvs() -> list:
     log_prints=True,
     tags=["external", "script"]
 )
-def run_script(cmd: str):
+def run_script(cmd: str, cwd: Optional[Path] = None):
     """
     Task de Prefect para ejecutar un script externo con trazabilidad.
     
     Args:
         cmd: Comando a ejecutar
+        cwd: Directorio de trabajo (default: directorio backend/)
         
     Returns:
         True si se ejecutó exitosamente
     """
     logger = get_run_logger()
-    logger.info(f'Running: {cmd}')
+    
+    # Si no se especifica cwd, usar el directorio backend/ (un nivel arriba de scripts/)
+    if cwd is None:
+        backend_dir = Path(__file__).resolve().parent.parent
+        cwd = backend_dir
+    
+    logger.info(f'Running: {cmd} (cwd: {cwd})')
     
     tracker = get_provenance_tracker()
     tracker.log_task(
         task_name="run_script",
-        input_data={'command': cmd},
+        input_data={'command': cmd, 'cwd': str(cwd)},
         output_data={},
     )
     
     try:
-        proc = subprocess.run(cmd, check=True, capture_output=True, text=True, shell=True)
+        proc = subprocess.run(
+            cmd, 
+            check=True, 
+            capture_output=True, 
+            text=True, 
+            shell=True,
+            cwd=str(cwd)
+        )
         if proc.stdout:
             logger.info(proc.stdout)
         if proc.stderr:
@@ -108,7 +123,7 @@ def run_script(cmd: str):
         logger.error(f'Command failed: {e}; stderr: {e.stderr}')
         tracker.log_task(
             task_name="run_script",
-            input_data={'command': cmd},
+            input_data={'command': cmd, 'cwd': str(cwd)},
             output_data={'error': str(e)},
         )
         raise
@@ -168,9 +183,8 @@ def etl_flow(sqlite_path: Optional[str] = None):
         all_transformed_data = []
 
         # Crear tablas canónicas antes de procesar
-        engine = create_engine(engine_url)
         try:
-            create_canonical_tables(engine, csvs, transform_func=transform_df)
+            create_canonical_tables(engine_url, csvs, transform_func=transform_df)
             logger.info('Tablas canónicas creadas/recreadas en la base SQLite antes de la ingesta')
         except Exception as e:
             logger.error(f'No se pudieron crear tablas canónicas: {e}. Continuando con ingestión dinámica')
@@ -336,37 +350,96 @@ def full_etl_pipeline(db_path: Optional[str] = None, gallito_limit: Optional[int
         dbp = Path(db_path) if db_path else config.SQLITE_PATH
 
         PY = shutil.which('python') or 'python'
-
+        
+        # Obtener directorios: backend/ y scripts/
+        backend_dir = Path(__file__).resolve().parent.parent
+        scripts_dir = backend_dir / "scripts"
+        
         # 1) Scrapers (opcional) -- ejecutar Mercadolibre y Gallito detail
         if not dry_run:
-            run_script(f"{PY} iDatos/backend/scripts/01_mercadolibre_scraper.py")
-            cmd_g = f"{PY} iDatos/backend/scripts/02_gallito_detail_scraper.py"
-            if gallito_limit:
-                cmd_g += f" --limit {gallito_limit}"
-            run_script(cmd_g)
+            scraper_ml = scripts_dir / "01_mercadolibre_scraper.py"
+            run_script(f'{PY} "{scraper_ml.as_posix()}"', cwd=backend_dir)
+            
+            # Ejecutar scraper de Gallito para generar archivo .with_addr.csv
+            scraper_g = scripts_dir / "02_gallito_detail_scraper.py"
+            
+            # Buscar archivo de entrada en múltiples ubicaciones
+            gallito_input_paths = [
+                backend_dir / "data" / "raw" / "gallito_alquileres_crudos.csv",  # Primero en data/raw/
+                backend_dir / "gallito_alquileres_crudos.csv",  # Luego en raíz de backend/
+            ]
+            
+            gallito_input = None
+            gallito_input_rel = None
+            for path in gallito_input_paths:
+                if path.exists():
+                    gallito_input = path
+                    # Ruta relativa desde backend_dir para el comando
+                    gallito_input_rel = path.relative_to(backend_dir).as_posix()
+                    break
+            
+            gallito_output_rel = "gallito_alquileres_crudos.with_addr.csv"
+            gallito_output = backend_dir / gallito_output_rel
+            
+            if gallito_input and gallito_input.exists():
+                try:
+                    cmd_g = f'{PY} "{scraper_g.as_posix()}" --input "{gallito_input_rel}" --output "{gallito_output_rel}"'
+                    if gallito_limit:
+                        cmd_g += f" --limit {gallito_limit}"
+                    logger.info(f'Ejecutando scraper de Gallito para generar {gallito_output_rel}')
+                    logger.info(f'  Input: {gallito_input_rel}')
+                    run_script(cmd_g, cwd=backend_dir)
+                    
+                    # Verificar que se generó el archivo
+                    if gallito_output.exists():
+                        logger.info(f'✓ Archivo generado exitosamente: {gallito_output_rel}')
+                    else:
+                        logger.warning(f'⚠ El scraper no generó el archivo esperado: {gallito_output_rel}')
+                except Exception as e:
+                    logger.warning(f'Error ejecutando scraper de Gallito: {e}. Continuando...')
+            else:
+                logger.warning(f'Archivo de entrada gallito_alquileres_crudos.csv no encontrado en {[str(p) for p in gallito_input_paths]}. Saltando scraper de Gallito.')
         else:
             logger.info('Dry-run: skipping scrapers')
 
-        # 2) Limpiar direcciones de Gallito
+        # 2) Limpiar direcciones de Gallito (solo si existe el archivo de entrada)
         if not dry_run:
-            run_script(
-                f"{PY} iDatos/backend/scripts/03_clean_gallito_addresses.py "
-                "--input gallito_alquileres_crudos.with_addr.csv"
-            )
+            gallito_with_addr = backend_dir / "gallito_alquileres_crudos.with_addr.csv"
+            if gallito_with_addr.exists():
+                clean_script = scripts_dir / "03_clean_gallito_addresses.py"
+                run_script(
+                    f'{PY} "{clean_script.as_posix()}" '
+                    f"--input {gallito_with_addr.name}",
+                    cwd=backend_dir
+                )
+            else:
+                logger.warning(f'Archivo {gallito_with_addr.name} no encontrado. Saltando limpieza de direcciones de Gallito.')
         else:
             logger.info('Dry-run: skipping clean_gallito_addresses')
 
-        # 3) Geocodificar en batch
+        # 3) Geocodificar en batch (solo si existe el archivo de entrada)
         if not dry_run:
-            run_script(
-                f"{PY} iDatos/backend/scripts/04_geocode_batch.py "
-                "--delay 1.0 --sources gallito_alquileres_crudos.with_addr.cleaned.csv"
-            )
-            # Reintentar no resueltos usando geocode.xyz script
-            run_script(
-                f"{PY} iDatos/backend/scripts/05_geocode_xyz_retry.py "
-                "--failed geocode_failed_*.csv --delay 1.2"
-            )
+            gallito_cleaned = backend_dir / "gallito_alquileres_crudos.with_addr.cleaned.csv"
+            if gallito_cleaned.exists():
+                geocode_script = scripts_dir / "04_geocode_batch.py"
+                run_script(
+                    f'{PY} "{geocode_script.as_posix()}" '
+                    f"--delay 1.0 --sources {gallito_cleaned.name}",
+                    cwd=backend_dir
+                )
+                # Reintentar no resueltos usando geocode.xyz script (solo si hay archivos fallidos)
+                failed_files = glob.glob(str(backend_dir / "geocode_failed_*.csv"))
+                if failed_files:
+                    geocode_xyz_script = scripts_dir / "05_geocode_xyz_retry.py"
+                    run_script(
+                        f'{PY} "{geocode_xyz_script.as_posix()}" '
+                        "--failed geocode_failed_*.csv --delay 1.2",
+                        cwd=backend_dir
+                    )
+                else:
+                    logger.info('No hay archivos de geocodificación fallidos. Saltando reintento con geocode.xyz')
+            else:
+                logger.warning(f'Archivo {gallito_cleaned.name} no encontrado. Saltando geocodificación en batch.')
         else:
             logger.info('Dry-run: skipping geocoding')
 
@@ -376,7 +449,7 @@ def full_etl_pipeline(db_path: Optional[str] = None, gallito_limit: Optional[int
 
         # 5) Enriquecimiento contextual (intentar ejecutar helper si está disponible)
         try:
-            from scripts.transformaciones.datos_contextuales import enrich_with_contextual_data as helper_enrich_context
+            from scripts.datos_contextuales import enrich_with_contextual_data as helper_enrich_context
             logger.info('Attempting contextual enrichment via helper')
             import sqlite3
             import pandas as pd
@@ -390,14 +463,17 @@ def full_etl_pipeline(db_path: Optional[str] = None, gallito_limit: Optional[int
 
         # 6) Cargar denuncias y unir
         if not dry_run:
-            run_script(f"{PY} iDatos/backend/scripts/07_load_denuncias_crime.py --db {dbp.as_posix()}")
-            run_script(f"{PY} iDatos/backend/scripts/08_join_crime_to_transformed.py --db {dbp.as_posix()}")
+            load_denuncias_script = scripts_dir / "07_load_denuncias_crime.py"
+            run_script(f'{PY} "{load_denuncias_script.as_posix()}" --db {dbp.as_posix()}', cwd=backend_dir)
+            join_crime_script = scripts_dir / "08_join_crime_to_transformed.py"
+            run_script(f'{PY} "{join_crime_script.as_posix()}" --db {dbp.as_posix()}', cwd=backend_dir)
         else:
             logger.info('Dry-run: skipping load/join of denuncias')
 
         # 7) Archivar coordenadas nulas
         if not dry_run:
-            run_script(f"{PY} iDatos/backend/scripts/09_archive_null_coords.py --db {dbp.as_posix()} --move")
+            archive_script = scripts_dir / "09_archive_null_coords.py"
+            run_script(f'{PY} "{archive_script.as_posix()}" --db {dbp.as_posix()} --move', cwd=backend_dir)
         else:
             logger.info('Dry-run: skipping archive_null_coords')
 
